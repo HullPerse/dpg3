@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+/* Register CSS custom properties as animatable */
+@property --dynamic-background {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #000000;
+}
+
+@property --dynamic-primary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #00ff00;
+}
+
+@property --dynamic-secondary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+
+@property --dynamic-muted {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #969696;
+}
+
+@property --dynamic-primary-opacity-15 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(0, 255, 0, 0.15);
+}
+
+@property --dynamic-primary-opacity-50 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(0, 255, 0, 0.5);
+}
+
+@property --dynamic-secondary-opacity-15 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.15);
+}
+
+@property --dynamic-secondary-opacity-50 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.5);
+}
+
+@property --dynamic-background-opacity-15 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(0, 0, 0, 0.15);
+}
+
+@property --dynamic-background-opacity-50 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(0, 0, 0, 0.5);
+}
+
+@property --dynamic-muted-opacity-15 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(150, 150, 150, 0.15);
+}
+
+@property --dynamic-muted-opacity-50 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(150, 150, 150, 0.5);
+}
+
+:root {
+  --dynamic-background: #000000;
+  --dynamic-primary: #00ff00;
+  --dynamic-secondary: #ffffff;
+  --dynamic-muted: #969696;
+
+  /* Enable transitions for CSS custom properties */
+  transition:
+    --dynamic-background 300ms ease-in-out,
+    --dynamic-primary 300ms ease-in-out,
+    --dynamic-secondary 300ms ease-in-out,
+    --dynamic-muted 300ms ease-in-out,
+    --dynamic-primary-opacity-15 300ms ease-in-out,
+    --dynamic-primary-opacity-50 300ms ease-in-out,
+    --dynamic-secondary-opacity-15 300ms ease-in-out,
+    --dynamic-secondary-opacity-50 300ms ease-in-out,
+    --dynamic-background-opacity-15 300ms ease-in-out,
+    --dynamic-background-opacity-50 300ms ease-in-out,
+    --dynamic-muted-opacity-15 300ms ease-in-out,
+    --dynamic-muted-opacity-50 300ms ease-in-out;
+}
+
+@theme {
+  --color-background: var(--dynamic-background);
+  --color-primary: var(--dynamic-primary);
+  --color-secondary: var(--dynamic-secondary);
+  --color-muted: var(--dynamic-muted);
+  --color-primary-opacity-15: var(--dynamic-primary-opacity-15);
+  --color-primary-opacity-50: var(--dynamic-primary-opacity-50);
+  --color-secondary-opacity-15: var(--dynamic-secondary-opacity-15);
+  --color-secondary-opacity-50: var(--dynamic-secondary-opacity-50);
+  --color-background-opacity-15: var(--dynamic-background-opacity-15);
+  --color-background-opacity-50: var(--dynamic-background-opacity-50);
+  --color-muted-opacity-15: var(--dynamic-muted-opacity-15);
+  --color-muted-opacity-50: var(--dynamic-muted-opacity-50);
+}
+
+@layer base {
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+  }
+
+  body {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+
+    scroll-behavior: smooth;
+  }
+
+  #root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+}
+
+html {
+  scrollbar-width: 1px;
+  scrollbar-color: transparent;
+  -ms-overflow-style: none;
+}
+
+* {
+  scrollbar-width: 1px;
+  -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+  width: 2px;
+  height: 4px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  display: none;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-primary) 90%, white);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

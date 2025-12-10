@@ -1,0 +1,139 @@
+import type { GameInterface, GameType, UpdateGamePayload } from "@/types/games";
+import { client } from "./client.api";
+
+export default class GamesApi {
+  getPresets = async () => {
+    return await client.collection("presets").getFullList();
+  };
+
+  changePreset = async (id: string, games: GameType[]) => {
+    return await client.collection("presets").update(id, {
+      games: games,
+    });
+  };
+
+  getSteamGame = async (appId: string) => {
+    const id = appId.trim();
+
+    if (!id) {
+      return { success: false, message: "Укажите ID игры Steam" };
+    }
+
+    const targetURL =
+      "https://cors-anywhere.com/" +
+      `https://store.steampowered.com/api/appdetails?appids=${id}`;
+
+    try {
+      const res = await fetch(targetURL);
+      if (!res.ok) {
+        return { success: false, message: `Ошибка запроса: ${res.status}` };
+      }
+
+      const json = await res.json();
+      const entry = json?.[id];
+
+      if (!entry?.success || !entry?.data) {
+        return { success: false, message: "Игра не найдена" };
+      }
+
+      const data = entry.data as Record<string, unknown> & {
+        background_raw?: string;
+      };
+
+      return {
+        success: true,
+        data,
+        message: "Игра найдена",
+      } as const;
+    } catch {
+      return { success: false, message: "Ошибка" };
+    }
+  };
+
+  createPreset = async (label: string, games: GameType[]) => {
+    return await client.collection("presets").create({
+      label,
+      games,
+    });
+  };
+
+  addGame = async (data: GameInterface) => {
+    return await client.collection("games").create(data);
+  };
+
+  deleteGame = async (id: string) => {
+    return await client.collection("games").delete(id);
+  };
+
+  updateGame = async (id: string, payload: UpdateGamePayload) => {
+    const hasFile = payload.reviewImage instanceof File;
+    const needsFormData =
+      hasFile ||
+      typeof payload.data === "object" ||
+      payload.reviewText === null ||
+      payload.reviewRating === null ||
+      payload.reviewImage === null;
+
+    if (needsFormData) {
+      const formData = new FormData();
+
+      if (payload.status) formData.append("status", payload.status);
+
+      if (payload.reviewText !== undefined) {
+        if (payload.reviewText === null) {
+          formData.append("reviewText", "");
+        } else if (typeof payload.reviewText === "string") {
+          formData.append("reviewText", payload.reviewText);
+        }
+      }
+
+      if (payload.reviewRating !== undefined) {
+        if (payload.reviewRating === null) {
+          formData.append("reviewRating", "");
+        } else if (typeof payload.reviewRating === "number") {
+          formData.append("reviewRating", String(payload.reviewRating));
+        }
+      }
+
+      if (payload.data)
+        formData.append(
+          "data",
+          JSON.stringify(payload.data as unknown as object),
+        );
+
+      if (payload.reviewImage !== undefined) {
+        if (payload.reviewImage === null) {
+          formData.append("reviewImage", "");
+        } else if (hasFile) {
+          formData.append("reviewImage", payload.reviewImage as File);
+        }
+      }
+
+      return await client.collection("games").update(id, formData);
+    }
+
+    const jsonPayload: Record<string, unknown> = {};
+
+    if (payload.status !== undefined) jsonPayload.status = payload.status;
+    if (payload.reviewText !== undefined) {
+      jsonPayload.reviewText = payload.reviewText ?? "";
+    }
+    if (payload.reviewRating !== undefined) {
+      jsonPayload.reviewRating = payload.reviewRating ?? null;
+    }
+    if (payload.data !== undefined) jsonPayload.data = payload.data;
+    if (payload.reviewImage === null) jsonPayload.reviewImage = "";
+
+    return await client.collection("games").update(id, jsonPayload);
+  };
+
+  getGames = async () => {
+    return await client.collection("games").getFullList();
+  };
+
+  getGamesByUser = async (id: string) => {
+    return await client.collection("games").getFullList({
+      filter: `user.id = "${id}"`,
+    });
+  };
+}
