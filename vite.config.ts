@@ -6,7 +6,6 @@ import { defineConfig } from "vite";
 import vCache from "@raegen/vite-plugin-vitest-cache";
 import { chunkSplitPlugin } from "vite-plugin-chunk-split";
 import viteCompression from "vite-plugin-compression";
-import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
@@ -15,15 +14,6 @@ export default defineConfig({
     tailwindcss(),
     chunkSplitPlugin(),
     vCache(),
-    ViteImageOptimizer({
-      exclude: "/public/favicon.svg",
-      avif: { quality: 80 },
-      webp: { quality: 80 },
-      jpeg: { quality: 80 },
-      png: { quality: 70 },
-      cache: true,
-      logStats: true,
-    }),
     viteCompression({
       algorithm: "brotliCompress",
       ext: ".br",
