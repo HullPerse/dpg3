@@ -24,6 +24,10 @@ export interface ThemeStore {
     enabled: boolean;
     type: string;
   };
+  scanlines: {
+    enabled: boolean;
+    opacity: number;
+  };
 
   // Actions
   updateColors: (color: Partial<UserColors>) => void;
@@ -31,5 +35,9 @@ export interface ThemeStore {
   setParticles: {
     enable: (value: boolean) => void;
     type: (value: string) => void;
+  };
+  setScanlines: {
+    enable: (value: boolean) => void;
+    opacity: (value: number) => void;
   };
 }

@@ -19,7 +19,7 @@ import { useThemeStore } from "./store/theme.store";
 const MainMap = lazy(() => import("@/pages/map/map.page"));
 
 function App() {
-  const { colors, particles } = useThemeStore((state) => state);
+  const { colors, particles, scanlines } = useThemeStore((state) => state);
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -69,9 +69,16 @@ function App() {
       className="flex flex-row h-screen w-screen bg-background scroll-smooth"
       onContextMenu={(e) => e.preventDefault()}
     >
+      <div
+        className="absolute w-full h-full z-50 scanlines"
+        style={{
+          opacity: scanlines.opacity,
+        }}
+        hidden={!scanlines.enabled}
+      />
+
       <ToastContainer />
       <Modal path={pathname} />
-
       <TransformWrapper {...transformWrapperProps}>
         <Sidebar />
         <section className="flex flex-col w-full h-full">

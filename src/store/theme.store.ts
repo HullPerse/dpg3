@@ -82,6 +82,10 @@ export const useThemeStore = create<ThemeStore>()(
         enabled: true,
         type: "particles",
       },
+      scanlines: {
+        enabled: true,
+        opacity: 1,
+      },
 
       updateColors: (color: Partial<UserColors>) => {
         const updatedColors = { ...get().colors, ...color };
@@ -120,12 +124,26 @@ export const useThemeStore = create<ThemeStore>()(
           }));
         },
       },
+
+      setScanlines: {
+        enable: (value: boolean) => {
+          set((state) => ({
+            scanlines: { ...state.scanlines, enabled: value },
+          }));
+        },
+        opacity: (value: number) => {
+          set((state) => ({
+            scanlines: { ...state.scanlines, opacity: value },
+          }));
+        },
+      },
     }),
     {
       name: STORAGE_KEY,
       partialize: (state) => ({
         colors: state.colors,
         particles: state.particles,
+        scanlines: state.scanlines,
       }),
       onRehydrateStorage: () => {
         return (state, error) => {

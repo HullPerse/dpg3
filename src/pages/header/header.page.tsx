@@ -37,12 +37,18 @@ import AddSteam from "../wheel/components/addSteam.component";
 import AddCustom from "../wheel/components/addCustom.component";
 import type { GameType } from "@/types/games";
 import GamesApi from "@/api/games.api";
+import Range from "@/components/ui/range.component";
 
 export default function Header() {
   const { isAuth, user } = useLoginStore((state) => state);
-  const { colors, updateColors, particles, setParticles } = useThemeStore(
-    (state) => state,
-  );
+  const {
+    colors,
+    updateColors,
+    particles,
+    setParticles,
+    scanlines,
+    setScanlines,
+  } = useThemeStore((state) => state);
 
   const [openAddGame, setOpenAddGame] = useState(false);
   const [openNotes, setOpenNotes] = useState(false);
@@ -213,8 +219,8 @@ export default function Header() {
           </TabsContent>
 
           <TabsContent value="particles" className="flex flex-col gap-6 px-2">
-            <section className="flex flex-col w-full items-center justify-between font-bold">
-              <div className="flex flex-row w-full items-center justify-between px-10">
+            <section className="flex flex-col w-full items-center justify-between font-bold gap-2">
+              <div className="flex flex-row w-full items-center justify-between border rounded p-2">
                 <span>Включить частицы</span>
                 <Switch
                   checked={particles.enabled}
@@ -242,6 +248,26 @@ export default function Header() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex flex-col w-full items-center border rounded p-2 gap-2">
+                <div className="flex flex-row w-full justify-between">
+                  <span>Включить ретро</span>
+                  <Switch
+                    checked={scanlines.enabled}
+                    onCheckedChange={setScanlines.enable}
+                  />
+                </div>
+                <div className="flex flex-row w-full justify-between">
+                  <span>Прозрачность ретро</span>
+                  <Range
+                    value={scanlines.opacity}
+                    onValueChange={setScanlines.opacity}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                  />
+                </div>
               </div>
             </section>
           </TabsContent>
