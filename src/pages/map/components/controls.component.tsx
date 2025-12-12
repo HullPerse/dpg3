@@ -47,7 +47,7 @@ function Controls() {
       jail: !user.jailStatus,
       vending: !user.vendingMachine?.includes(user.data?.cell),
       poop: !data,
-      trash: user.data.cell === 20 || user.trash === true,
+      trash: user.data.cell !== 20 || user.trash === true,
     };
   }, [user, data]);
 
