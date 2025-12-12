@@ -10,6 +10,7 @@ import { regularPoop } from "@/config/items.config";
 import { mapButtons } from "@/config/map.config";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLoginStore } from "@/store/login.store";
+import type { MapCellsType } from "@/types/map";
 
 import Dice from "./dice.component";
 import Trash from "./trash.component";
@@ -18,7 +19,7 @@ import Vending from "./vending.component";
 const usersApi = new UsersApi();
 const mapApi = new MapApi();
 
-function Controls() {
+function Controls({ currentCell }: Readonly<{ currentCell: MapCellsType }>) {
   const { user, isAuth } = useLoginStore((state) => state);
   const queryClient = useQueryClient();
 
@@ -44,7 +45,7 @@ function Controls() {
 
     return {
       dice: false,
-      jail: !user.jailStatus,
+      jail: false,
       vending: !user.vendingMachine?.includes(user.data?.cell),
       poop: !data,
       trash: user.data.cell !== 20 || user.trash === true,
@@ -76,7 +77,18 @@ function Controls() {
       },
       jail: async () => {
         setLoading(true);
-        await usersApi.changeJail(String(user?.id), false);
+
+        if (!user?.jailStatus) {
+          await mapApi.dropCell(
+            String(user?.id),
+            currentCell.position,
+            currentCell.id,
+            currentCell.label,
+          );
+        }
+
+        await usersApi.changeJail(String(user?.id), !user?.jailStatus);
+
         setLoading(false);
       },
       vending: () => {
@@ -101,7 +113,20 @@ function Controls() {
         setLoading(false);
       },
     };
-  }, [user]);
+  }, [user, currentCell]);
+
+  const getLabel = useCallback(
+    (type: string, label: string) => {
+      if (!user) return;
+
+      const labelMap = {
+        jail: user.jailStatus ? "Выйти из тюрьмы" : "Сесть в тюрьму",
+      };
+
+      return labelMap[type as keyof typeof labelMap] ?? label;
+    },
+    [user],
+  );
 
   const invalidateQuery = useCallback(() => {
     startTransition(() => {
@@ -142,7 +167,7 @@ function Controls() {
             <SmallLoader />
           ) : (
             <>
-              {button.icon} {button.label}
+              {button.icon} {getLabel(button.type, button.label)}
             </>
           )}
         </Button>

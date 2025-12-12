@@ -1,6 +1,6 @@
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { startTransition, useCallback } from "react";
+import { startTransition, useCallback, useMemo } from "react";
 import { client } from "@/api/client.api";
 import MapApi from "@/api/map.api";
 import UsersApi from "@/api/users.api";
@@ -43,6 +43,7 @@ export default function MainMap() {
         ...filteredCells,
         info: cellsInfo as unknown as cellsType[],
         user: userData,
+        allCells: cellsData as unknown as MapCellsType[],
       };
     },
     refetchOnMount: true,
@@ -151,6 +152,11 @@ export default function MainMap() {
   useSubscription("cells", "*", invalidateQuery);
   useSubscription("inventory", "*", invalidateQuery);
 
+  const getUserCell = useMemo(() => {
+    if (!user) return;
+    return data?.allCells.find((cell) => cell.id === user.data.cell);
+  }, [data, user]);
+
   if (isError) return <ModalError />;
   if (isLoading) return <ModalLoading />;
 
@@ -209,7 +215,7 @@ export default function MainMap() {
                 ))}
             </div>
 
-            <Controls />
+            <Controls currentCell={getUserCell as MapCellsType} />
 
             <div className="flex flex-col gap-1">
               {data?.right.map((cell) => (

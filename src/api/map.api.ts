@@ -38,6 +38,7 @@ export default class MapApi {
     position: "left" | "right" | "top" | "bottom",
     cell: number,
     cellName: string,
+    log?: boolean,
   ) => {
     const [startCell, firstJail, secondJail] = [0, 10, 30];
     const targetJail = () => {
@@ -63,16 +64,19 @@ export default class MapApi {
       fields: "username",
     });
 
-    const logsApi = new LogsApi();
+    if (log) {
+      const logsApi = new LogsApi();
 
-    await logsApi.createLog({
-      type: "dropCell",
-      sender: {
-        id: id,
-        username: user.username.toUpperCase(),
-      },
-      label: cellName,
-    });
+      await logsApi.createLog({
+        type: "dropCell",
+        sender: {
+          id: id,
+          username: user.username.toUpperCase(),
+        },
+        label: cellName,
+      });
+    }
+
     const CellData = await usersApi.getJson("map");
 
     const jailCell = CellData.find(

@@ -107,6 +107,7 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
       cell.position as "left" | "right" | "top" | "bottom",
       cell.id,
       cell.label,
+      true,
     );
     setLoading(false);
   }, [user, cell]);
