@@ -18,6 +18,7 @@ const ItemCard = ({
   inventoryId,
   initialCharge,
   inventoryUserId,
+  className,
 }: ItemCardProps) => {
   const queryClient = useQueryClient();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -137,6 +138,7 @@ const ItemCard = ({
         "bg-background/50 backdrop-blur-sm w-3xl",
         "min-h-[120px] h-fit p-4",
         "transition-all duration-200",
+        className,
         onClick &&
           "cursor-pointer hover:border-primary hover:bg-background/70 hover:shadow-lg hover:shadow-primary/10",
       )}

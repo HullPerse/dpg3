@@ -12,6 +12,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useLoginStore } from "@/store/login.store";
 
 import Dice from "./dice.component";
+import Trash from "./trash.component";
 import Vending from "./vending.component";
 
 const usersApi = new UsersApi();
@@ -39,22 +40,28 @@ function Controls() {
   });
 
   const disabledStates = useMemo(() => {
-    if (!user) {
-      return {
-        dice: true,
-        jail: true,
-        vending: true,
-        poop: true,
-      };
-    }
+    if (!user) return true;
 
     return {
       dice: false,
       jail: !user.jailStatus,
       vending: !user.vendingMachine?.includes(user.data?.cell),
       poop: !data,
+      trash: user.data.cell === 20 || user.trash === true,
     };
   }, [user, data]);
+
+  const getComponent = useCallback((type: string) => {
+    const componentMap = {
+      dice: <Dice setIsOpen={() => setDialog({ open: false, type: null })} />,
+      vending: (
+        <Vending setIsOpen={() => setDialog({ open: false, type: null })} />
+      ),
+      trash: <Trash setIsOpen={() => setDialog({ open: false, type: null })} />,
+    };
+
+    return componentMap[type as keyof typeof componentMap];
+  }, []);
 
   const handleButton = useMemo(() => {
     return {
@@ -85,6 +92,14 @@ function Controls() {
         await mapApi.poopCell(String(user?.id), 1, String(user?.data?.cell));
         setLoading(false);
       },
+      trash: () => {
+        setLoading(true);
+        setDialog({
+          open: true,
+          type: "trash",
+        });
+        setLoading(false);
+      },
     };
   }, [user]);
 
@@ -109,11 +124,7 @@ function Controls() {
         open={dialog.open}
         onOpenChange={() => setDialog({ open: false, type: null })}
       >
-        {dialog.type === "dice" ? (
-          <Dice setIsOpen={() => setDialog({ open: false, type: null })} />
-        ) : (
-          <Vending setIsOpen={() => setDialog({ open: false, type: null })} />
-        )}
+        {dialog.open && getComponent(dialog.type as keyof typeof getComponent)}
       </Dialog>
 
       {mapButtons.map((button) => (
@@ -122,8 +133,9 @@ function Controls() {
           className="w-[220px]"
           onClick={handleButton[button.type as keyof typeof handleButton]}
           disabled={
-            disabledStates[button.type as keyof typeof disabledStates] ||
-            loading
+            isAuth
+              ? disabledStates[button.type as keyof typeof disabledStates]
+              : true || loading
           }
         >
           {loading ? (

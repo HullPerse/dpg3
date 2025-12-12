@@ -1,4 +1,4 @@
-import { Dices, Hamburger, PersonStanding, Toilet } from "lucide-react";
+import { Dices, Hamburger, PersonStanding, Toilet, Trash } from "lucide-react";
 
 export const mapButtons = [
   {
@@ -20,5 +20,10 @@ export const mapButtons = [
     type: "poop",
     label: "Насрать",
     icon: <Toilet />,
+  },
+  {
+    type: "trash",
+    label: "Мусорка",
+    icon: <Trash />,
   },
 ];

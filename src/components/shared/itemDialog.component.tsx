@@ -34,8 +34,10 @@ import { cn, typeColor } from "@/lib/utils";
 import { useLoginStore } from "@/store/login.store";
 import type { ItemType } from "@/types/items";
 import type { LogType } from "@/types/log";
+import ItemsApi from "@/api/items.api";
 
 const usersApi = new UsersApi();
+const itemsApi = new ItemsApi();
 
 export default function ItemDialog({
   open,
@@ -118,6 +120,7 @@ export default function ItemDialog({
     }
 
     try {
+      await itemsApi.addTrash(item.id);
       await usersApi.removeItem(inventoryId as string);
       if (user?.id) {
         queryClient.invalidateQueries({

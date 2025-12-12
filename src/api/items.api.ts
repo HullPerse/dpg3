@@ -15,6 +15,10 @@ export default class ItemsApi {
     return data;
   };
 
+  getSingleItemById = async (id: string) => {
+    return (await client.collection("items").getOne(id)) as ItemType;
+  };
+
   addNewItem = async (data: ItemType | FormData) => {
     return await client.collection("items").create(data);
   };
@@ -38,5 +42,30 @@ export default class ItemsApi {
     return await client.collection("inventory").getFullList({
       filter: `userId = "${userId}"`,
     });
+  };
+
+  //TRASH
+  getTrash = async () => {
+    const items = await client.collection("trash").getFullList();
+
+    const itemsArray: ItemType[] = [];
+
+    for (const item of items) {
+      await this.getSingleItemById(item.itemId).then((data) => {
+        itemsArray.push({ ...data, instanceId: item.id });
+      });
+    }
+
+    return itemsArray;
+  };
+
+  addTrash = async (itemId: string) => {
+    return await client.collection("trash").create({
+      itemId: itemId,
+    });
+  };
+
+  removeTrash = async (itemId: string) => {
+    return await client.collection("trash").delete(itemId);
   };
 }

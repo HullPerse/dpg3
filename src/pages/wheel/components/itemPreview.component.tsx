@@ -7,21 +7,24 @@ import { Button } from "@/components/ui/button.component";
 import { SmallLoader } from "@/components/ui/loader.components";
 import Toast from "@/components/ui/toast.component";
 import { useLoginStore } from "@/store/login.store";
+import { cn } from "@/lib/utils";
 
 function ItemPreview({
   previewItem,
   setPreviewItem,
+  className,
 }: Readonly<{
   previewItem: RecordModel | null;
   setPreviewItem: (item: RecordModel | null) => void;
+  className?: string;
 }>) {
   const [isAdding, setIsAdding] = useState(false);
   const queryClient = useQueryClient();
   const user = useLoginStore((state) => state.user);
 
   return (
-    <>
-      <ItemCard item={previewItem} />
+    <main className={cn("flex flex-col", className)}>
+      <ItemCard item={previewItem} className={className} />
       <Button
         className="w-full my-1"
         disabled={isAdding}
@@ -55,7 +58,7 @@ function ItemPreview({
       >
         {isAdding ? <SmallLoader /> : "Добавить в инвентарь"}
       </Button>
-    </>
+    </main>
   );
 }
 

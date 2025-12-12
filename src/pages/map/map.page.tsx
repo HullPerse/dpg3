@@ -119,6 +119,7 @@ export default function MainMap() {
           if (targetCell?.type === "start") {
             await usersApi.changeMoney(user.id, 500, 1);
             await usersApi.changeVending(user.id);
+            await usersApi.changeTrash(user.id, false);
           }
         }
 

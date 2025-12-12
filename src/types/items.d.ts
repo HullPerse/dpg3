@@ -9,6 +9,7 @@ export interface ItemType {
   usage?: boolean;
   automatic?: boolean;
   effect: string;
+  instanceId?: string;
 }
 
 export type ItemCardProps = {
@@ -19,6 +20,7 @@ export type ItemCardProps = {
   inventoryId?: string;
   initialCharge?: number;
   inventoryUserId?: string;
+  className?: string;
 };
 
 export type tradeType = {
@@ -29,4 +31,8 @@ export type tradeType = {
   label: string;
   image: string;
   charge: number;
+};
+
+export type TrashType = {
+  itemId: string;
 };

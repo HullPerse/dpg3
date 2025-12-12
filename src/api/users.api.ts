@@ -279,6 +279,12 @@ export default class UsersApi {
     });
   };
 
+  changeTrash = async (id: string, trash: boolean) => {
+    return await client.collection("users").update(id, {
+      trash: trash,
+    });
+  };
+
   exchangeItems = async (
     targetId: string,
     items: Array<{
