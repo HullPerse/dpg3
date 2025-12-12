@@ -1,5 +1,5 @@
 import imageCompression from "browser-image-compression";
-import { File, Image as ImageIcon, Paperclip, Star, X } from "lucide-react";
+import { FileIcon, Image as ImageIcon, Paperclip, Star, X } from "lucide-react";
 import type { RecordModel } from "pocketbase";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -78,17 +78,19 @@ export default function EditReviewDialog({
   const compressImage = useCallback(
     async (f: File): Promise<File> => {
       if (f.type === "image/gif") return f;
-      try {
-        const compressed = await imageCompression(f, compressionOptions);
-        const base = f.name.replace(/\.[^.]+$/, "");
-        // @ts-expect-error
-        return new File([compressed], `${base}.webp`, {
-          type: "image/webp",
-          lastModified: Date.now(),
-        });
-      } catch {
-        return f;
-      }
+
+      const compressed = (await imageCompression(
+        f,
+        compressionOptions,
+      )) as Blob;
+      const base = `${f.name.replace(/\.[^.]+$/, "")}.webp` as string;
+
+      const file: File = new File([compressed], base, {
+        type: "image/webp",
+        lastModified: Date.now(),
+      });
+
+      return file;
     },
     [compressionOptions],
   );
@@ -125,7 +127,6 @@ export default function EditReviewDialog({
     onDrop,
     accept: {
       "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
-      "model/fbx": [".fbx"],
     },
     multiple: false,
     noClick: true,
@@ -360,7 +361,7 @@ export default function EditReviewDialog({
               <div className="relative">
                 {is3DModel ? (
                   <div className="h-16 w-16 flex items-center justify-center rounded border border-border bg-background">
-                    <File className="h-8 w-8 text-primary" />
+                    <FileIcon className="h-8 w-8 text-primary" />
                   </div>
                 ) : (
                   preview && (
@@ -381,7 +382,10 @@ export default function EditReviewDialog({
                 </Button>
               </div>
               <span className="text-sm text-primary flex-1 truncate">
-                {file?.name}
+                <span className="text-sm text-primary flex-1 truncate">
+                  {"Изображение." +
+                    file?.name.split(".")[file?.name.split.length - 1]}
+                </span>
               </span>
             </div>
           )}

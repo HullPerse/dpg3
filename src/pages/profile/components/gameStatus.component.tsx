@@ -1,5 +1,5 @@
 import imageCompression from "browser-image-compression";
-import { File, Image as ImageIcon, Paperclip, Star, X } from "lucide-react";
+import { FileIcon, Image as ImageIcon, Paperclip, Star, X } from "lucide-react";
 import type { RecordModel } from "pocketbase";
 import { memo, useCallback, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -81,13 +81,18 @@ function GameStatus({
     async (f: File): Promise<File> => {
       if (f.type === "image/gif") return f;
 
-      const compressed = await imageCompression(f, compressionOptions);
-      const base = f.name.replace(/\.[^.]+$/, "");
-      //@ts-expect-error
-      return new File([compressed], `${base}.webp`, {
+      const compressed = (await imageCompression(
+        f,
+        compressionOptions,
+      )) as Blob;
+      const base = `${f.name.replace(/\.[^.]+$/, "")}.webp` as string;
+
+      const file: File = new File([compressed], base, {
         type: "image/webp",
         lastModified: Date.now(),
       });
+
+      return file;
     },
     [compressionOptions],
   );
@@ -338,7 +343,7 @@ function GameStatus({
               <div className="relative">
                 {is3DModel ? (
                   <div className="h-16 w-16 flex items-center justify-center rounded border border-border bg-background">
-                    <File className="h-8 w-8 text-primary" />
+                    <FileIcon className="h-8 w-8 text-primary" />
                   </div>
                 ) : (
                   preview && (
@@ -359,7 +364,8 @@ function GameStatus({
                 </Button>
               </div>
               <span className="text-sm text-primary flex-1 truncate">
-                {file?.name}
+                {"Изображение." +
+                  file?.name.split(".")[file?.name.split.length - 1]}
               </span>
             </div>
           )}
