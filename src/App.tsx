@@ -66,7 +66,7 @@ function App() {
 
   return (
     <main
-      className="flex flex-row h-screen w-screen bg-background scroll-smooth"
+      className="flex flex-row h-screen w-screen bg-background scroll-smooth "
       onContextMenu={(e) => e.preventDefault()}
     >
       <div

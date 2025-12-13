@@ -258,8 +258,8 @@ export default function Header() {
                     onCheckedChange={setScanlines.enable}
                   />
                 </div>
-                <div className="flex flex-row w-full justify-between">
-                  <span>Прозрачность ретро</span>
+                <div className="flex flex-row w-full justify-between gap-2">
+                  <span>Прозрачность</span>
                   <Range
                     value={scanlines.opacity}
                     onValueChange={setScanlines.opacity}

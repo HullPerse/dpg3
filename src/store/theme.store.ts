@@ -83,7 +83,7 @@ export const useThemeStore = create<ThemeStore>()(
         type: "particles",
       },
       scanlines: {
-        enabled: true,
+        enabled: false,
         opacity: 1,
       },
 
