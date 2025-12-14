@@ -1,27 +1,19 @@
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { lazy, Suspense, useEffect, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { ModalLoading } from "@/components/ui/modal.state";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs.components";
 
 const Profile = lazy(() => import("./tabs/profile.tab"));
 const Inventory = lazy(() => import("./tabs/inventory.tab"));
 const Games = lazy(() => import("./tabs/games.tab"));
-
-const TABS = [
-  {
-    label: "Профиль",
-    component: Profile,
-  },
-  {
-    label: "Инвентарь",
-    component: Inventory,
-  },
-  {
-    label: "Игры",
-    component: Games,
-  },
-];
 
 export default function UserProfile() {
   const params = useParams({ strict: false });
@@ -32,30 +24,52 @@ export default function UserProfile() {
     (search as { tab?: string })?.tab || "Профиль",
   );
 
+  const TABS = useMemo(
+    () => [
+      {
+        label: "Профиль",
+        component: Profile,
+      },
+      {
+        label: "Инвентарь",
+        component: Inventory,
+      },
+      {
+        label: "Игры",
+        component: Games,
+      },
+    ],
+
+    [],
+  );
+
   useEffect(() => {
     const tabFromUrl = (search as { tab?: string })?.tab;
 
     if (tabFromUrl && TABS.some((tab) => tab.label === tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
-  }, [search]);
+  }, [search, TABS]);
 
-  const handleChangeTab = (value: string) => {
-    setActiveTab(value);
+  const handleChangeTab = useCallback(
+    (value: string) => {
+      setActiveTab(value);
 
-    if (params.id) {
-      navigate({
-        to: "/profile/$id",
-        params: { id: params.id },
-        search: { tab: value },
-      });
-    } else {
-      navigate({
-        to: "/profile",
-        search: { tab: value },
-      });
-    }
-  };
+      if (params.id) {
+        navigate({
+          to: "/profile/$id",
+          params: { id: params.id },
+          search: { tab: value },
+        });
+      } else {
+        navigate({
+          to: "/profile",
+          search: { tab: value },
+        });
+      }
+    },
+    [params.id, navigate],
+  );
 
   return (
     <main className="h-full w-full p-4 md:p-6">

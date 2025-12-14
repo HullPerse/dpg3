@@ -10,6 +10,7 @@ import {
 } from "react";
 import ItemsApi from "@/api/items.api";
 import UsersApi from "@/api/users.api";
+import ItemCard from "@/components/shared/itemCard.component";
 import { Button } from "@/components/ui/button.component";
 import { SmallLoader } from "@/components/ui/loader.components";
 import { ModalError, ModalLoading } from "@/components/ui/modal.state";
@@ -30,11 +31,11 @@ import {
   rollPrepare,
   updateWheelAnimation,
 } from "@/lib/wheel.utils";
-import {
-  renderWheelItems,
-  type ExtendedType,
-} from "../components/itemsRender.component";
 import Container from "../components/container.component";
+import {
+  type ExtendedType,
+  renderWheelItems,
+} from "../components/itemsRender.component";
 
 const ITEM_WIDTH = 144;
 
@@ -246,12 +247,6 @@ export default function Inventory() {
   }, [userItems]);
 
   useEffect(() => {
-    if (!isRolling) {
-      updateCenterHighlight();
-    }
-  }, [isRolling, updateCenterHighlight]);
-
-  useEffect(() => {
     if (!isRolling) updateCenterHighlight();
   }, [updateCenterHighlight, isRolling]);
 
@@ -358,31 +353,9 @@ export default function Inventory() {
               {userInventory?.inventoryWithItems &&
                 userInventory.inventoryWithItems.length > 0 && (
                   <div className="flex flex-col gap-2">
-                    {userInventory.inventoryWithItems.map(
-                      ({ inventoryEntry, item }, index) => {
-                        const charge = inventoryEntry.charge;
-                        const inventoryChargeValue =
-                          typeof charge === "number" ? charge : undefined;
-                        return (
-                          <div
-                            key={`${inventoryEntry.id}-${index}`}
-                            className="w-full p-4 border border-primary/30 rounded bg-card/50 hover:bg-card/70 transition-colors"
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="text-primary font-bold">
-                                {(item as unknown as { label?: string })
-                                  .label || "Item"}
-                              </div>
-                              {inventoryChargeValue !== undefined && (
-                                <div className="text-primary/70 text-sm">
-                                  Заряды: {inventoryChargeValue}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      },
-                    )}
+                    {userInventory.inventoryWithItems.map((item) => (
+                      <ItemCard key={item.item.id} {...item} />
+                    ))}
                   </div>
                 )}
 

@@ -12,8 +12,8 @@ import { cn, getType } from "@/lib/utils";
 import { useLoginStore } from "@/store/login.store";
 import type { MapCellProps } from "@/types/map";
 import type { User } from "@/types/users";
-import UserComponent from "./user.component";
 import MapCard from "./card.component";
+import UserComponent from "./user.component";
 
 function Cell({ type, className, cell, info, user }: Readonly<MapCellProps>) {
   const auth = useLoginStore((state) => state.user);

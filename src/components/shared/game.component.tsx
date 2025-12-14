@@ -13,7 +13,7 @@ import {
   Trash,
 } from "lucide-react";
 import type { RecordModel } from "pocketbase";
-import { memo, Suspense, useState } from "react";
+import { memo, Suspense, useCallback, useState } from "react";
 import GamesApi from "@/api/games.api";
 import { Image } from "@/components/shared/image.component";
 import { Button } from "@/components/ui/button.component";
@@ -41,6 +41,14 @@ function GameCard({
   const user = useLoginStore((state) => state.user);
   const params = useParams({ strict: false });
 
+  const handleStatusChange = useCallback((status: StatusType) => {
+    setOpenStatus(status);
+  }, []);
+
+  const handleDelete = useCallback(() => {
+    setOpenDelete(true);
+  }, []);
+
   return (
     <main className="relative flex flex-col w-3xl border border-primary rounded overflow-hidden">
       <section className="absolute top-1 right-1 z-50 flex flex-row gap-2">
@@ -48,7 +56,7 @@ function GameCard({
           <Button
             size="icon"
             className="flex items-center justify-center text-center"
-            onClick={() => setOpenStatus("COMPLETED")}
+            onClick={() => handleStatusChange("COMPLETED")}
             hidden={user?.id !== params.id}
           >
             <Check className="w-4 h-4" />
@@ -59,7 +67,7 @@ function GameCard({
           <Button
             size="icon"
             className="flex items-center justify-center text-center"
-            onClick={() => setOpenStatus("PLAYING")}
+            onClick={() => handleStatusChange("PLAYING")}
             hidden={user?.id !== params.id}
           >
             <Play className="w-4 h-4" />
@@ -70,7 +78,7 @@ function GameCard({
           <Button
             size="icon"
             className="flex items-center justify-center text-center"
-            onClick={() => setOpenStatus("DROPPED")}
+            onClick={() => handleStatusChange("DROPPED")}
             hidden={user?.id !== params.id}
           >
             <Ban className="w-4 h-4" />
@@ -81,7 +89,7 @@ function GameCard({
           <Button
             size="icon"
             className="flex items-center justify-center text-center"
-            onClick={() => setOpenStatus("REROLL")}
+            onClick={() => handleStatusChange("REROLL")}
             hidden={user?.id !== params.id}
           >
             <RefreshCcw className="w-4 h-4" />
@@ -90,7 +98,7 @@ function GameCard({
         <Button
           size="icon"
           className="flex items-center justify-center text-center"
-          onClick={() => setOpenDelete(true)}
+          onClick={handleDelete}
           hidden={user?.id !== params.id}
         >
           <Trash className="w-4 h-4" />
