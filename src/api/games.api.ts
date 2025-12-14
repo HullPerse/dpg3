@@ -2,16 +2,10 @@ import type { GameInterface, GameType, UpdateGamePayload } from "@/types/games";
 import { client } from "./client.api";
 
 export default class GamesApi {
-  getPresets = async () => {
-    return await client.collection("presets").getFullList();
-  };
+  private readonly gamesCollection = client.collection("games");
+  private readonly presetsCollection = client.collection("preset");
 
-  changePreset = async (id: string, games: GameType[]) => {
-    return await client.collection("presets").update(id, {
-      games: games,
-    });
-  };
-
+  //GAMES
   getSteamGame = async (appId: string) => {
     const id = appId.trim();
 
@@ -50,19 +44,12 @@ export default class GamesApi {
     }
   };
 
-  createPreset = async (label: string, games: GameType[]) => {
-    return await client.collection("presets").create({
-      label,
-      games,
-    });
-  };
-
   addGame = async (data: GameInterface) => {
-    return await client.collection("games").create(data);
+    return await this.gamesCollection.create(data);
   };
 
   deleteGame = async (id: string) => {
-    return await client.collection("games").delete(id);
+    return await this.gamesCollection.delete(id);
   };
 
   updateGame = async (id: string, payload: UpdateGamePayload) => {
@@ -109,7 +96,7 @@ export default class GamesApi {
         }
       }
 
-      return await client.collection("games").update(id, formData);
+      return await this.gamesCollection.update(id, formData);
     }
 
     const jsonPayload: Record<string, unknown> = {};
@@ -124,16 +111,34 @@ export default class GamesApi {
     if (payload.data !== undefined) jsonPayload.data = payload.data;
     if (payload.reviewImage === null) jsonPayload.reviewImage = "";
 
-    return await client.collection("games").update(id, jsonPayload);
+    return await this.gamesCollection.update(id, jsonPayload);
   };
 
   getGames = async () => {
-    return await client.collection("games").getFullList();
+    return await this.gamesCollection.getFullList();
   };
 
   getGamesByUser = async (id: string) => {
-    return await client.collection("games").getFullList({
+    return await this.gamesCollection.getFullList({
       filter: `user.id = "${id}"`,
+    });
+  };
+
+  //PRESETS
+  getPresets = async () => {
+    return await this.presetsCollection.getFullList();
+  };
+
+  changePreset = async (id: string, games: GameType[]) => {
+    return await this.presetsCollection.update(id, {
+      games: games,
+    });
+  };
+
+  createPreset = async (label: string, games: GameType[]) => {
+    return await this.presetsCollection.create({
+      label,
+      games,
     });
   };
 }

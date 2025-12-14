@@ -40,7 +40,7 @@ export const useVendingMachine = () => {
           const items = JSON.parse(saved) as SavedVendingState[];
           const itemsId = items.map((item) => item.id);
 
-          const allitems = await itemsApi.getVendingItems(itemsId);
+          const allitems = await itemsApi.getItemsByIds(itemsId);
           //@ts-expect-error i dont care...
           return allitems.map((item) => {
             const findItem = items.find((i) => i.id === item.id);

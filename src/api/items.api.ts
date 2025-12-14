@@ -2,51 +2,56 @@ import type { ItemType } from "@/types/items";
 import { client } from "./client.api";
 
 export default class ItemsApi {
+  private readonly itemsCollection = client.collection("items");
+  private readonly inventoryCollection = client.collection("inventory");
+  private readonly trashCollection = client.collection("trash");
+
   //ITEMS
   getAllItems = async () => {
-    return await client.collection("items").getFullList();
+    return await this.itemsCollection.getFullList();
   };
 
   getItemsByIds = async (ids: string[]) => {
-    const filterId = ids.map((item) => `id='${item}'`).join("||");
-    const data = await client.collection("items").getFullList({
-      filter: filterId,
-    });
-    return data;
+    if (ids.length === 0) return [];
+
+    const filter = ids.map((id) => `id='${id}'`).join("||");
+    return await this.itemsCollection.getFullList({ filter });
   };
 
   getSingleItemById = async (id: string) => {
-    return (await client.collection("items").getOne(id)) as ItemType;
+    return (await this.itemsCollection.getOne(id)) as ItemType;
   };
 
   addNewItem = async (data: ItemType | FormData) => {
-    return await client.collection("items").create(data);
-  };
-
-  getVendingItems = async (id: string[]) => {
-    const filterId = id.map((item) => `id='${item}'`).join("||");
-    const data = await client.collection("items").getFullList({
-      filter: filterId,
-    });
-    return data;
+    return await this.itemsCollection.create(data);
   };
 
   getAllIds = async () => {
-    return await client.collection("items").getFullList({
+    return await this.itemsCollection.getFullList({
       fields: "id",
     });
   };
 
   //INVENTORY
   getInventory = async (userId: string) => {
-    return await client.collection("inventory").getFullList({
+    return await this.inventoryCollection.getFullList({
       filter: `userId = "${userId}"`,
     });
   };
 
+  getInventoryItems = async (userId: string, itemId: string) => {
+    return await this.inventoryCollection.getFullList({
+      filter: `userId = "${userId}" && itemId = "${itemId}"`,
+    });
+  };
+
+  removeInventoryItem = async (id: string) => {
+    return await this.inventoryCollection.delete(id);
+  };
+
   //TRASH
   getTrash = async () => {
-    const items = await client.collection("trash").getFullList();
+    const items = await this.trashCollection.getFullList();
 
     const itemsArray: ItemType[] = [];
 
@@ -60,12 +65,12 @@ export default class ItemsApi {
   };
 
   addTrash = async (itemId: string) => {
-    return await client.collection("trash").create({
+    return await this.trashCollection.create({
       itemId: itemId,
     });
   };
 
   removeTrash = async (itemId: string) => {
-    return await client.collection("trash").delete(itemId);
+    return await this.trashCollection.delete(itemId);
   };
 }

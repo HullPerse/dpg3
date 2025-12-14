@@ -2,6 +2,8 @@ import type { LogType } from "@/types/log";
 import { client } from "./client.api";
 
 export default class LogsApi {
+  private readonly logsCollection = client.collection("logs");
+
   createLog = async ({
     type,
     sender,
@@ -21,7 +23,7 @@ export default class LogsApi {
     label?: string;
     image?: string;
   }) => {
-    return await client.collection("logs").create({
+    return await this.logsCollection.create({
       sender: {
         id: sender.id,
         username: sender.username,
@@ -37,11 +39,11 @@ export default class LogsApi {
   };
 
   getLogs = async () => {
-    return await client.collection("logs").getFullList();
+    return await this.logsCollection.getFullList();
   };
 
   getLogsByUser = async (username: string) => {
-    return await client.collection("logs").getFullList({
+    return await this.logsCollection.getFullList({
       filter: `sender.username = "${username}" || receiver.username = "${username}"`,
     });
   };

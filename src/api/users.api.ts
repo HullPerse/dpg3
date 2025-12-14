@@ -4,11 +4,27 @@ import type { LogType } from "@/types/log";
 import type { MapCellsType } from "@/types/map";
 import type { CreateUser, JsonRecord, User } from "@/types/users";
 import { client, itemImage } from "./client.api";
+
 import ItemsApi from "./items.api";
 import LogsApi from "./logs.api";
 import MapApi from "./map.api";
 
 export default class UsersApi {
+  private readonly usersCollection = client.collection("users");
+  private readonly itemsCollection = client.collection("items");
+  private readonly inventoryCollection = client.collection("inventory");
+  private readonly jsonCollection = client.collection("json");
+
+  private readonly logsApi: LogsApi;
+  private readonly itemsApi: ItemsApi;
+  private readonly mapApi: MapApi;
+
+  constructor(logsApi?: LogsApi, itemsApi?: ItemsApi, mapApi?: MapApi) {
+    this.logsApi = logsApi || new LogsApi();
+    this.itemsApi = itemsApi || new ItemsApi();
+    this.mapApi = mapApi || new MapApi(this);
+  }
+
   createUser = async (data: CreateUser) => {
     const allUsers = await this.getExistingUsers();
 
@@ -42,7 +58,7 @@ export default class UsersApi {
         },
       };
 
-      await client.collection("users").create(userData);
+      await this.usersCollection.create(userData);
     } catch (error) {
       console.error("Ошибка при создании пользователя:", error);
       throw error;
@@ -50,33 +66,33 @@ export default class UsersApi {
   };
 
   getUsers = async () => {
-    return await client.collection("users").getFullList();
+    return await this.usersCollection.getFullList();
   };
 
   getExistingUsers = async () => {
-    return await client.collection("users").getFullList({
+    return await this.usersCollection.getFullList({
       fields: "username, avatar, color, id",
     });
   };
 
   getUserById = async (id: string) => {
-    return await client.collection("users").getOne(id);
+    return await this.usersCollection.getOne(id);
   };
 
   getUsernameById = async (id: string) => {
-    return await client.collection("users").getOne(id, {
+    return await this.usersCollection.getOne(id, {
       fields: "username",
     });
   };
 
   getMoney = async (id: string) => {
-    return await client.collection("users").getOne(id, {
+    return await this.usersCollection.getOne(id, {
       fields: "data",
     });
   };
 
   changeMoney = async (id: string, money: number, finish?: number) => {
-    const user = await client.collection("users").getOne(id, {
+    const user = await this.usersCollection.getOne(id, {
       fields: "data",
     });
 
@@ -85,7 +101,7 @@ export default class UsersApi {
     const currentCell = (user.data as User["data"]).cell;
     const totalFinish = (user.data as User["data"]).totalFinish;
 
-    return await client.collection("users").update(id, {
+    return await this.usersCollection.update(id, {
       data: {
         money: {
           current: currentMoney + money,
@@ -101,7 +117,7 @@ export default class UsersApi {
     let itemCharge: number | null;
 
     if (charge === undefined) {
-      const item = await client.collection("items").getOne(itemId, {
+      const item = await this.itemsCollection.getOne(itemId, {
         fields: "label, image, id, charge",
       });
       itemCharge = item.charge ?? null;
@@ -109,17 +125,17 @@ export default class UsersApi {
       itemCharge = charge;
     }
 
-    const item = await client.collection("items").getOne(itemId, {
+    const item = await this.itemsCollection.getOne(itemId, {
       fields: "label, image, id",
     });
 
-    await client.collection("inventory").create({
+    await this.inventoryCollection.create({
       userId: userId,
       itemId: itemId,
       charge: itemCharge,
     });
 
-    const user = await client.collection("users").getOne(userId, {
+    const user = await this.usersCollection.getOne(userId, {
       fields: "username",
     });
 
@@ -129,7 +145,7 @@ export default class UsersApi {
       image: `${itemImage}${item.id}/${item.image}`,
     };
 
-    return await new LogsApi().createLog({
+    return await this.logsApi.createLog({
       type: logData.type,
       sender: {
         id: userId,
@@ -142,17 +158,17 @@ export default class UsersApi {
   };
 
   removeItem = async (id: string) => {
-    return await client.collection("inventory").delete(id);
+    return await this.inventoryCollection.delete(id);
   };
 
   changeCharges = async (inventoryId: string, charge: number) => {
-    return await client.collection("inventory").update(inventoryId, {
+    return await this.inventoryCollection.update(inventoryId, {
       charge: charge,
     });
   };
 
   getStats = async (id: string) => {
-    return await client.collection("users").getFirstListItem(`id = "${id}"`, {
+    return await this.usersCollection.getFirstListItem(`id = "${id}"`, {
       fields: "id, username, avatar, color, data",
     });
   };
@@ -166,12 +182,8 @@ export default class UsersApi {
     steppedOnPoop?: boolean,
     finishAmount?: number,
   ) => {
-    const itemsApi = new ItemsApi();
-    const mapApi = new MapApi();
-    const logsApi = new LogsApi();
-
     const user = await this.getUserById(userId);
-    const inventory = await itemsApi.getInventory(userId);
+    const inventory = await this.itemsApi.getInventory(userId);
 
     const userSkis = inventory.find((item) => item.itemId === regularPoop);
     const userBoots = inventory.find((item) => item.itemId === poopBoots);
@@ -194,13 +206,13 @@ export default class UsersApi {
       };
 
       for (const cell of resultCells()) {
-        const cellPooped = await mapApi
+        const cellPooped = await this.mapApi
           .getSingleCell(cell.label)
           .then((res) => res.some((cell) => cell.poop));
 
         if (cellPooped) continue;
         const level = getCellLevel(cell.difficulty);
-        await mapApi.poopCell(userId, level, cell.label);
+        await this.mapApi.poopCell(userId, level, cell.label);
       }
 
       await this.removeItem(userSkis.id);
@@ -211,7 +223,7 @@ export default class UsersApi {
         await this.changePooped(userId, true);
       }
 
-      await mapApi.removePoop(cellName);
+      await this.mapApi.removePoop(cellName);
       if (userBoots) await this.removeItem(userBoots.id);
     }
 
@@ -228,7 +240,7 @@ export default class UsersApi {
       },
     };
 
-    await client.collection("users").update(user.id, {
+    await this.usersCollection.update(user.id, {
       data: currentData,
     });
 
@@ -241,7 +253,7 @@ export default class UsersApi {
       }
     }
 
-    await logsApi.createLog({
+    await this.logsApi.createLog({
       type: "moveUser",
       sender: {
         id: userId,
@@ -254,13 +266,13 @@ export default class UsersApi {
   };
 
   changePooped = async (id: string, pooped: boolean) => {
-    await client.collection("users").update(id, {
+    await this.usersCollection.update(id, {
       isPooped: pooped,
     });
   };
 
   itemAvailability = async (userId: string, itemId: string) => {
-    const result = await client.collection("inventory").getFullList({
+    const result = await this.inventoryCollection.getFullList({
       filter: `userId = "${userId}" && itemId = "${itemId}"`,
     });
 
@@ -268,19 +280,19 @@ export default class UsersApi {
   };
 
   changeJail = async (id: string, status: boolean) => {
-    return await client.collection("users").update(id, {
+    return await this.usersCollection.update(id, {
       jailStatus: status,
     });
   };
 
   changeVending = async (id: string) => {
-    return await client.collection("users").update(id, {
+    return await this.usersCollection.update(id, {
       vendingMachine: getVending(),
     });
   };
 
   changeTrash = async (id: string, trash: boolean) => {
-    return await client.collection("users").update(id, {
+    return await this.usersCollection.update(id, {
       trash: trash,
     });
   };
@@ -298,28 +310,39 @@ export default class UsersApi {
 
       await this.removeItem(item.instanceId);
     }
-
-    // WARNING: This works better in terms of performance, but since i wont exchange more than ~30 items at once, i will use cleaner version
-
-    // await Promise.all(
-    //   items.map((item) =>
-    //     client.collection("inventory").create({
-    //       itemId: item.itemId,
-    //       userId: targetId,
-    //       charge: item.charge,
-    //     }),
-    //   ),
-    // );
-
-    // await Promise.all(
-    //   items.map((item) =>
-    //     client.collection("inventory").delete(item.instanceId),
-    //   ),
-    // );
   };
 
+  //-------------------
+  // WARNING: This works better in terms of performance, but since i wont exchange more than ~30 items at once, i will use cleaner version
+  //-------------------
+  // exchangeItems = async (
+  //   targetId: string,
+  //   items: Array<{
+  //     itemId: string;
+  //     charge: number;
+  //     instanceId: string;
+  //   }>,
+  // ) => {
+  // await Promise.all(
+  //   items.map((item) =>
+  //     this.inventoryCollection.create({
+  //       itemId: item.itemId,
+  //       userId: targetId,
+  //       charge: item.charge,
+  //     }),
+  //   ),
+  // );
+
+  // await Promise.all(
+  //   items.map((item) =>
+  //     this.inventoryCollection.delete(item.instanceId),
+  //   ),
+  // );
+  // };
+  //-------------------
+
   getJson = async (type: "map"): Promise<MapCellsType[]> => {
-    const data = await client.collection("json").getFullList<JsonRecord>({
+    const data = await this.jsonCollection.getFullList<JsonRecord>({
       filter: `type = "${type}"`,
       fields: "source",
     });
