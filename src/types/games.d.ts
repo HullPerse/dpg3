@@ -33,6 +33,7 @@ export interface GameType {
 }
 
 export interface GameInterface {
+  id?: string;
   user: {
     id: string;
     username: string;

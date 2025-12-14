@@ -10,6 +10,7 @@ const WheelPreset = lazy(() => import("./tabs/preset.tab"));
 const WheelAllPreset = lazy(() => import("./tabs/games.tab"));
 const WheelUser = lazy(() => import("./tabs/users.tab"));
 const WheelUserItem = lazy(() => import("./tabs/inventory.tab"));
+const WheelUserGames = lazy(() => import("./tabs/userGames.tab"));
 const WheelCustom = lazy(() => import("./tabs/custom.tab"));
 
 export default function Wheel() {
@@ -42,6 +43,11 @@ export default function Wheel() {
         value: "UserList" as const,
         label: "Пользователи",
         component: WheelUser,
+      },
+      {
+        value: "UserGames" as const,
+        label: "Игры пользователей",
+        component: WheelUserGames,
       },
       {
         value: "UserItems" as const,

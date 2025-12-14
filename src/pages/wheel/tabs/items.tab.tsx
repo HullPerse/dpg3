@@ -39,6 +39,7 @@ import {
   renderWheelItems,
 } from "../components/itemsRender.component";
 import ItemPreview from "../components/itemPreview.component";
+import Container from "../components/container.component";
 
 const types = ["все", "бафф", "дебафф"];
 const ITEM_WIDTH = 144;
@@ -384,18 +385,10 @@ export default function Items() {
               value={item}
               className="text-primary w-2xl flex flex-col items-center justify-center gap-2"
             >
-              {/* Wheel Section */}
-              <section className="max-w-full w-2xl flex items-center justify-center mx-auto">
-                <div className="relative w-full h-48 border-2 border-primary rounded overflow-hidden bg-card/50 shadow-lg glow-effect">
-                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-primary z-10 shadow-[0_0_10px_rgba(0,255,0,0.8)]" />
-                  <div
-                    ref={containerRef}
-                    className="flex items-center h-full will-change-transform"
-                  >
-                    {renderedItems}
-                  </div>
-                </div>
-              </section>
+              <Container
+                containerRef={containerRef}
+                renderedItems={renderedItems}
+              />
 
               <section className="flex flex-row gap-1 my-2 w-full">
                 <Button

@@ -3,7 +3,7 @@ import { client } from "./client.api";
 
 export default class GamesApi {
   private readonly gamesCollection = client.collection("games");
-  private readonly presetsCollection = client.collection("preset");
+  private readonly presetsCollection = client.collection("presets");
 
   //GAMES
   getSteamGame = async (appId: string) => {
