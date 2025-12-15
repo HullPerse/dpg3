@@ -30,7 +30,7 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
   const [loading, setLoading] = useState(false);
 
   const { data, isError, isLoading } = useQuery({
-    queryKey: ["cell"],
+    queryKey: ["cell", cell.label],
     queryFn: async () => {
       return {
         cell: await mapApi.getSingleCell(cell.label),
@@ -42,36 +42,8 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
         auntZina: await usersApi.itemAvailability(auntZina, String(user?.id)),
       };
     },
+    enabled: isAuth,
   });
-
-  const userHistory = useMemo(() => {
-    if (!data?.cell) return [];
-
-    const filteredCells = data?.cell.filter((record) => !record?.poop);
-    if (!filteredCells) return [];
-
-    const stats = filteredCells.reduce<
-      Record<string, { username: string; count: number }>
-    >((acc, record) => {
-      const username = record?.user?.username ?? "Неизвестный";
-      const userId = record?.user?.userId ?? username;
-
-      if (!acc[userId]) {
-        acc[userId] = { username, count: 0 };
-      }
-
-      acc[userId].count += 1;
-      return acc;
-    }, {});
-
-    return Object.entries(stats)
-      .map(([id, value]) => ({ id, ...value }))
-      .sort(
-        (a, b) =>
-          b.count - a.count ||
-          a.username.localeCompare(b.username, "ru", { sensitivity: "base" }),
-      );
-  }, [data]);
 
   const handleTakeCell = useCallback(async () => {
     setLoading(true);
@@ -139,14 +111,43 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
     return await usersApi.removeItem(auntZinaId.id);
   }, [user, cell.label]);
 
+  const userHistory = useMemo(() => {
+    if (!data?.cell) return [];
+
+    const filteredCells = data?.cell.filter((record) => !record?.poop);
+    if (!filteredCells) return [];
+
+    const stats = filteredCells.reduce<
+      Record<string, { username: string; count: number }>
+    >((acc, record) => {
+      const username = record?.user?.username ?? "Неизвестный";
+      const userId = record?.user?.userId ?? username;
+
+      if (!acc[userId]) {
+        acc[userId] = { username, count: 0 };
+      }
+
+      acc[userId].count += 1;
+      return acc;
+    }, {});
+
+    return Object.entries(stats)
+      .map(([id, value]) => ({ id, ...value }))
+      .sort(
+        (a, b) =>
+          b.count - a.count ||
+          a.username.localeCompare(b.username, "ru", { sensitivity: "base" }),
+      );
+  }, [data]);
+
   const invalidateQuery = useCallback(() => {
     startTransition(() => {
       queryClient.invalidateQueries({
-        queryKey: ["cell"],
+        queryKey: ["cell", cell.label],
         refetchType: "all",
       });
     });
-  }, [queryClient]);
+  }, [queryClient, cell.label]);
 
   useSubscription("users", "*", invalidateQuery);
   useSubscription("cells", "*", invalidateQuery);
@@ -244,7 +245,7 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
       <Button
         className="w-full text-left font-mono transition-all duration-200 border border-red-500 text-red-500 font-bold hover:text-red-500 hover:bg-red-500/10"
         onClick={handleDropCell}
-        disabled={loading || !localStorage.getItem("pocketbase_auth")}
+        disabled={loading || !isAuth}
       >
         {loading ? <SmallLoader /> : "ДРОПНУТЬ"}
       </Button>
