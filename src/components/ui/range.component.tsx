@@ -1,11 +1,12 @@
 import {
   type ChangeEvent,
   type ComponentProps,
+  useCallback,
   useMemo,
   useState,
 } from "react";
 import { cn } from "@/lib/utils";
-import { useDebouncedCallback } from "use-debounce";
+
 type BaseProps = Omit<
   ComponentProps<"input">,
   "type" | "onChange" | "value" | "defaultValue"
@@ -103,20 +104,7 @@ function Range({
     (onValueChange as SingleRangeProps["onValueChange"])?.(next);
   };
 
-  const handleLowChange = useDebouncedCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const next = Number(e.target.value);
-      const [, high] = doubleValue;
-      const clamped = Math.min(Math.max(next, minNum), high);
-      const nextTuple: [number, number] = [clamped, high];
-
-      if (!isDoubleControlled) setDoubleInternal(nextTuple);
-      (onValueChange as DoubleRangeProps["onValueChange"])?.(nextTuple);
-    },
-    300,
-  );
-
-  const handleHighChange = useDebouncedCallback(
+  const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const next = Number(e.target.value);
       const [low] = doubleValue;
@@ -126,7 +114,7 @@ function Range({
       if (!isDoubleControlled) setDoubleInternal(nextTuple);
       (onValueChange as DoubleRangeProps["onValueChange"])?.(nextTuple);
     },
-    300,
+    [doubleValue, maxNum, isDoubleControlled, onValueChange],
   );
 
   return (
@@ -151,7 +139,7 @@ function Range({
               max={max}
               step={step}
               value={doubleValue[0]}
-              onChange={handleLowChange}
+              onChange={handleChange}
               type="range"
               className={cn(
                 "relative z-10 w-full appearance-none bg-transparent focus:outline-none pointer-events-none",
@@ -168,7 +156,7 @@ function Range({
               max={max}
               step={step}
               value={doubleValue[1]}
-              onChange={handleHighChange}
+              onChange={handleChange}
               type="range"
               className={cn(
                 "absolute inset-0 z-20 w-full appearance-none bg-transparent focus:outline-none pointer-events-none",
