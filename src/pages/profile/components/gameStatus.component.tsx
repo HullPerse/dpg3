@@ -7,10 +7,11 @@ import GamesApi from "@/api/games.api";
 import ItemsApi from "@/api/items.api";
 import LogsApi from "@/api/logs.api";
 import UsersApi from "@/api/users.api";
-import Editor from "@/components/shared/editor.lazy";
 import { Image } from "@/components/shared/image.component";
 import { Button } from "@/components/ui/button.component";
 import { SmallLoader } from "@/components/ui/loader.components";
+import Editor from "@/components/shared/editor.component";
+
 import {
   Dialog,
   DialogContent,

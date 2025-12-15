@@ -1,13 +1,21 @@
+import Bold from "@tiptap/extension-bold";
+import Document from "@tiptap/extension-document";
+import Image from "@tiptap/extension-image";
+import Italic from "@tiptap/extension-italic";
+import Paragraph from "@tiptap/extension-paragraph";
+import Strike from "@tiptap/extension-strike";
+import Text from "@tiptap/extension-text";
+import Underline from "@tiptap/extension-underline";
+import { UndoRedo } from "@tiptap/extensions";
 import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+
 import {
-  Bold,
-  Heading1,
-  Heading2,
-  Italic,
-  List,
-  ListOrdered,
+  BoldIcon,
+  Image as ImageIcon,
+  ItalicIcon,
   Redo,
+  Strikethrough,
+  UnderlineIcon,
   Undo,
 } from "lucide-react";
 import { memo } from "react";
@@ -32,7 +40,17 @@ function Editor({
   className,
 }: Readonly<SimpleEditorProps>) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      Bold,
+      Document,
+      Italic,
+      Paragraph,
+      Text,
+      Underline,
+      Strike,
+      Image,
+      UndoRedo,
+    ],
     content,
     editable,
     onUpdate: ({ editor }) => {
@@ -66,36 +84,36 @@ function Editor({
 
   const toolbarItems = [
     {
-      icon: Bold,
+      icon: BoldIcon,
       action: () => editor.chain().focus().toggleBold().run(),
       active: editor.isActive("bold"),
       disabled: !editor.can().chain().focus().toggleBold().run(),
     },
     {
-      icon: Italic,
+      icon: ItalicIcon,
       action: () => editor.chain().focus().toggleItalic().run(),
       active: editor.isActive("italic"),
       disabled: !editor.can().chain().focus().toggleItalic().run(),
     },
     {
-      icon: Heading1,
-      action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      active: editor.isActive("heading", { level: 1 }),
+      icon: UnderlineIcon,
+      action: () => editor.chain().focus().toggleUnderline().run(),
+      active: editor.isActive("underline"),
     },
     {
-      icon: Heading2,
-      action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      active: editor.isActive("heading", { level: 2 }),
+      icon: Strikethrough,
+      action: () => editor.chain().focus().toggleStrike().run(),
+      active: editor.isActive("strike"),
     },
     {
-      icon: List,
-      action: () => editor.chain().focus().toggleBulletList().run(),
-      active: editor.isActive("bulletList"),
-    },
-    {
-      icon: ListOrdered,
-      action: () => editor.chain().focus().toggleOrderedList().run(),
-      active: editor.isActive("orderedList"),
+      icon: ImageIcon,
+      action: () => {
+        const url = window.prompt("Enter image URL:");
+        if (url) {
+          editor.chain().focus().setImage({ src: url }).run();
+        }
+      },
+      active: false,
     },
   ];
 
