@@ -152,8 +152,7 @@ export default defineConfig({
               return "image-compression";
             if (id.includes("react-dropzone")) return "dropzone";
             if (id.includes("@radix-ui")) return "radix-ui";
-            if (id.includes("chart.js") || id.includes("react-chartjs-2"))
-              return "charts";
+            if (id.includes("recharts")) return "charts";
             if (id.includes("@tiptap")) return "tiptap";
             return "vendor";
           }

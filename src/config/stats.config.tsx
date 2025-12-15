@@ -11,15 +11,6 @@ import {
   RussianRuble,
 } from "lucide-react";
 
-import {
-  BarElement,
-  CategoryScale,
-  Chart as ChartJSLib,
-  Legend,
-  LinearScale,
-  Tooltip,
-} from "chart.js";
-
 export const statData = [
   {
     label: "Корона",
@@ -82,31 +73,3 @@ export const statData = [
     row: 4,
   },
 ];
-
-ChartJSLib.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
-
-export const chartDefaults = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: true,
-      position: "top" as const,
-      labels: {
-        color: "var(--foreground)",
-        font: { size: 12 },
-        usePointStyle: true,
-      },
-    },
-    tooltip: {
-      backgroundColor: "black",
-      titleColor: "transparent",
-      bodyColor: "var(--primary)",
-      borderColor: "white",
-      borderWidth: 1,
-      padding: 8,
-      cornerRadius: 4,
-      displayColors: true,
-    },
-  },
-};

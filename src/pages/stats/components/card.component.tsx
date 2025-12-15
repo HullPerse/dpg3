@@ -1,4 +1,3 @@
-import type { ChartOptions } from "chart.js";
 import {
   lazy,
   memo,
@@ -9,15 +8,10 @@ import {
   useState,
 } from "react";
 import { SmallLoader } from "@/components/ui/loader.components";
-import { chartDefaults } from "@/config/stats.config";
 import { cn } from "@/lib/utils";
 import type { DataItem, StatCardProps } from "@/types/stats";
 
-const Bar = lazy(() =>
-  import("@/config/stats.config").then(() =>
-    import("react-chartjs-2").then((m) => ({ default: m.Bar })),
-  ),
-);
+const Rechart = lazy(() => import("./rechart.component"));
 
 function Card({
   className,
@@ -122,25 +116,6 @@ function Card({
     allReviews,
   ]);
 
-  // Invert the values ONLY for droppedGames: smaller original numbers = bigger bars
-  const chartValues = useMemo(() => {
-    if (currentDataType !== "droppedGames") {
-      return originalValues; // Return original values for all other data types
-    }
-
-    if (originalValues.length === 0) return [];
-
-    // Find the maximum value to use as reference
-    const maxValue = Math.max(...originalValues);
-
-    // Invert the values: inverted = maxValue - originalValue + 1
-    // The +1 ensures that 0 values still show up as visible bars
-    return originalValues.map((value) => {
-      if (value === 0) return maxValue + 1; // Make 0 the largest bar
-      return maxValue - value + 1;
-    });
-  }, [originalValues, currentDataType]);
-
   const colors = useMemo(
     () => activeData.map((item) => item.color),
     [activeData],
@@ -148,94 +123,14 @@ function Card({
 
   const primaryColor = colors.length > 0 ? colors[0] : "var(--chart-1)";
 
-  // Memoize chart data to prevent unnecessary re-renders
-  const chartData = useMemo(
-    () => ({
-      labels,
-      datasets: [
-        {
-          label: item.label,
-          data: chartValues,
-          backgroundColor: colors.length > 0 ? colors : "hsl(var(--chart-1))",
-          borderColor: "var(--border)",
-          borderWidth: 1,
-          borderRadius: 4,
-          borderSkipped: false as const,
-        },
-      ],
-    }),
-    [labels, chartValues, colors, item.label],
-  );
-
-  // Memoize chart options to prevent unnecessary re-renders
-  const chartOptions: ChartOptions<"bar"> = useMemo(
-    () => ({
-      ...chartDefaults,
-      plugins: {
-        ...chartDefaults.plugins,
-        tooltip: {
-          ...chartDefaults.plugins.tooltip,
-          callbacks: {
-            label: (context) => {
-              const originalValue = originalValues[context.dataIndex];
-              if (currentDataType === "droppedGames") {
-                return `${
-                  chartData.labels[context.dataIndex]
-                }: ${originalValue}`;
-              }
-              return `${chartData.labels[context.dataIndex]}: ${originalValue}`;
-            },
-          },
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: "var(--foreground)",
-            font: { size: 11 },
-            // Show values for all data types except droppedGames
-            callback: (value) => {
-              if (currentDataType === "droppedGames") {
-                // For dropped games, we can hide the inverted scale values or show them
-                return ""; // Hide inverted values for dropped games
-              }
-              return value.toString(); // Show normal values for other data types
-            },
-          },
-          grid: {
-            color: "var(--border) / 0.3",
-          },
-          title: {
-            display: currentDataType === "droppedGames",
-            text: "Fewer dropped games = Bigger bar",
-            color: "var(--foreground)",
-            font: { size: 10 },
-          },
-        },
-        x: {
-          ticks: {
-            color: "var(--foreground)",
-            font: { size: 11 },
-            maxRotation: 45,
-          },
-          grid: {
-            color: "var(--border) / 0.3",
-            display: false,
-          },
-        },
-      },
-      layout: {
-        padding: {
-          top: 10,
-          bottom: 10,
-          left: 10,
-          right: 10,
-        },
-      },
-    }),
-    [currentDataType, originalValues, chartData.labels],
-  );
+  // Prepare data for Recharts
+  const rechartData = useMemo(() => {
+    return labels.map((label, index) => ({
+      username: label,
+      value: originalValues[index],
+      color: colors[index] || "hsl(var(--chart-1))",
+    }));
+  }, [labels, originalValues, colors]);
 
   const renderLeaderboardItems = () => {
     // For dropped games, sort by ascending order (lower values first)
@@ -447,7 +342,7 @@ function Card({
           </span>
         </div>
         <span
-          className="flex flex-row w-full items-center justify-center text-sm gap-2 text-muted-foreground p-1 border-b"
+          className="flex flex-row w-full items-center justify-center text-sm gap-2  p-1 border-b"
           style={{
             borderBottomColor: isHovered ? primaryColor : "var(--primary)",
           }}
@@ -467,7 +362,10 @@ function Card({
             }}
           >
             <Suspense fallback={<SmallLoader />}>
-              <Bar data={chartData} options={chartOptions} />
+              <Rechart
+                data={rechartData}
+                isDroppedGames={currentDataType === "droppedGames"}
+              />
             </Suspense>
           </div>
         ) : (
