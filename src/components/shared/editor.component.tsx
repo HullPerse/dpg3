@@ -30,6 +30,7 @@ interface SimpleEditorProps {
   placeholder?: string;
   editable?: boolean;
   className?: string;
+  onImagePaste?: (file: File) => void;
 }
 
 function Editor({
@@ -38,6 +39,7 @@ function Editor({
   placeholder = "Напишите отзыв...",
   editable = true,
   className,
+  onImagePaste,
 }: Readonly<SimpleEditorProps>) {
   const editor = useEditor({
     extensions: [
@@ -57,6 +59,28 @@ function Editor({
       onChange?.(editor.getHTML());
     },
     editorProps: {
+      handlePaste: (_, event) => {
+        const items = Array.from(event.clipboardData?.items || []);
+
+        for (const item of items) {
+          if (item.type.startsWith("image/")) {
+            event.preventDefault();
+
+            const file = item.getAsFile();
+            if (!file) continue;
+
+            // If parent component handles image paste, delegate to it
+            if (onImagePaste) {
+              onImagePaste(file);
+              return true;
+            }
+
+            return false;
+          }
+        }
+
+        return false;
+      },
       attributes: {
         class: cn(
           "min-h-[150px] w-full p-4 focus:outline-none",
@@ -69,6 +93,18 @@ function Editor({
     },
   });
 
+  const handleImageUpload = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file && onImagePaste) {
+        onImagePaste(file);
+      }
+    };
+    input.click();
+  };
   if (!editor) {
     return (
       <div
@@ -107,12 +143,7 @@ function Editor({
     },
     {
       icon: ImageIcon,
-      action: () => {
-        const url = window.prompt("Enter image URL:");
-        if (url) {
-          editor.chain().focus().setImage({ src: url }).run();
-        }
-      },
+      action: handleImageUpload,
       active: false,
     },
   ];

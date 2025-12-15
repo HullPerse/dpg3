@@ -5,10 +5,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { gameImage } from "@/api/client.api";
 import GamesApi from "@/api/games.api";
+import Editor from "@/components/shared/editor.component";
 import { Image } from "@/components/shared/image.component";
 import { Button } from "@/components/ui/button.component";
 import { SmallLoader } from "@/components/ui/loader.components";
-import Editor from "@/components/shared/editor.component";
 import {
   Dialog,
   DialogContent,
@@ -295,6 +295,19 @@ export default function EditReviewDialog({
                     onChange={(e) => {
                       setReviewText(e);
                       setRemoveText(false);
+                    }}
+                    onImagePaste={async (file) => {
+                      setUploading(true);
+                      try {
+                        const c = await compressImage(file);
+                        setFile(c);
+                        setIs3DModel(false);
+                        setRemoveImage(false);
+                        const url = URL.createObjectURL(c);
+                        setPreview(url);
+                      } finally {
+                        setUploading(false);
+                      }
                     }}
                     placeholder="Напишите отзыв..."
                     editable={!removeText}
