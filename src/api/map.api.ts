@@ -102,6 +102,12 @@ export default class MapApi {
     return await this.mapCollection.getFullList();
   };
 
+  getUserCells = async (id: string) => {
+    return await this.mapCollection.getFullList({
+      filter: `user.userId = "${id}"`,
+    });
+  };
+
   getSingleCell = async (label: string) => {
     return await this.mapCollection.getFullList({
       filter: `name = "${label}"`,

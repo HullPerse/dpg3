@@ -392,6 +392,14 @@ const Trash = memo(
                 className="w-2xl"
               />
             ))}
+
+            {data?.length === 0 && (
+              <span>
+                <span className="text-muted-foreground">
+                  В мусорке пока ничего нет
+                </span>
+              </span>
+            )}
           </section>
         </main>
       </DialogContent>

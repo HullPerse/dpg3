@@ -6,7 +6,13 @@ import UsersApi from "@/api/users.api";
 import { Button } from "@/components/ui/button.component";
 import { SmallLoader } from "@/components/ui/loader.components";
 import { ModalError, ModalLoading } from "@/components/ui/modal.state";
-import { auntZina, legendaryPoop } from "@/config/items.config";
+import {
+  auntZina,
+  electricityTax,
+  legendaryPoop,
+  lifeTax,
+  noTax,
+} from "@/config/items.config";
 import { useSubscription } from "@/hooks/useSubscription";
 import {
   getCellCost,
@@ -18,6 +24,7 @@ import {
 } from "@/lib/utils";
 import { useLoginStore } from "@/store/login.store";
 import type { MapCellsType } from "@/types/map";
+import { airport, metro } from "@/config/map.config";
 
 const mapApi = new MapApi();
 const usersApi = new UsersApi();
@@ -29,21 +36,54 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
 
   const [loading, setLoading] = useState(false);
 
-  const { data, isError, isLoading } = useQuery({
+  const { data, isError, isLoading, refetch } = useQuery({
     queryKey: ["cell", cell.label],
     queryFn: async () => {
+      const cellData = await mapApi.getSingleCell(cell.label);
+
+      const calculateTax = async () => {
+        if (!cellData[0]?.level || !isAuth) return 0;
+
+        const baseTax = getCellTax(cellData[0].level).money;
+
+        const isNoTax = await usersApi.itemAvailability(
+          String(user?.id),
+          noTax,
+        );
+        const isElectricityTax = await usersApi.itemAvailability(
+          String(user?.id),
+          electricityTax,
+        );
+        const isLifeTax = await usersApi.itemAvailability(
+          String(user?.id),
+          lifeTax,
+        );
+
+        if (isNoTax) return 0;
+        if (isElectricityTax) return Math.floor(baseTax * 4);
+        if (isLifeTax) return baseTax * 10;
+
+        return baseTax;
+      };
+
+      const allCells = await mapApi.getUserCells(String(user?.id));
+      const price = Math.floor((allCells.length / 2) * 100);
+
       return {
-        cell: await mapApi.getSingleCell(cell.label),
+        cell: cellData,
+        cellTax: await calculateTax(),
+        ticketPrice: price,
         cellPoop: await mapApi.isPooped(cell.label),
         legendaryPoop: await usersApi.itemAvailability(
-          legendaryPoop,
           String(user?.id),
+          legendaryPoop,
         ),
-        auntZina: await usersApi.itemAvailability(auntZina, String(user?.id)),
+        auntZina: await usersApi.itemAvailability(String(user?.id), auntZina),
       };
     },
-    enabled: isAuth,
   });
+
+  refetch();
 
   const handleTakeCell = useCallback(async () => {
     setLoading(true);
@@ -63,6 +103,8 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
     };
 
     await mapApi.takeCell(cellData, false);
+
+    if (cell.id === metro[0]) await usersApi.moveTarget(user.id, metro[1], 0);
 
     setLoading(false);
   }, [user, cell]);
@@ -91,10 +133,12 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
     const level = getCellLevel(cell.difficulty);
 
     await mapApi.legendaryPoopCell(user.id, level, cell.label);
-    return setLoading(false);
+    setLoading(false);
   }, [user, data, cell]);
 
   const handleRemovePoop = useCallback(async () => {
+    if (!user?.id) return;
+
     const cellInfo = await mapApi
       .getSingleCell(cell.label)
       .then((res) => res.filter((cell) => cell.poop));
@@ -104,17 +148,17 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
     }
 
     const auntZinaId = await itemsApi
-      .getInventory(String(user?.id))
+      .getInventory(String(user.id))
       .then((res) => res.find((item) => item.itemId === auntZina));
     if (!auntZinaId) return;
 
-    return await usersApi.removeItem(auntZinaId.id);
+    await usersApi.removeItem(auntZinaId.id);
   }, [user, cell.label]);
 
   const userHistory = useMemo(() => {
     if (!data?.cell) return [];
 
-    const filteredCells = data?.cell.filter((record) => !record?.poop);
+    const filteredCells = data.cell.filter((record) => !record?.poop);
     if (!filteredCells) return [];
 
     const stats = filteredCells.reduce<
@@ -139,6 +183,14 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
           a.username.localeCompare(b.username, "ru", { sensitivity: "base" }),
       );
   }, [data]);
+
+  const handleAirport = useCallback(async () => {
+    if (!user || !data?.ticketPrice) return;
+
+    await usersApi.changeMoney(user.id, -data?.ticketPrice);
+
+    await usersApi.moveTarget(user.id, airport[1], 0);
+  }, [user, data?.ticketPrice]);
 
   const invalidateQuery = useCallback(() => {
     startTransition(() => {
@@ -194,6 +246,27 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
             </span>
           </div>
         ))}
+
+        {cell.id === metro[0] && (
+          <div className="flex justify-between items-start gap-3 min-w-0">
+            <span className="font-mono text-md shrink-0">Метро:</span>
+            <span className="font-mono text-md text-muted text-right wrap-break-word min-w-0 flex-1">
+              После захвата клетки, вы переместитесь на конечную станцию
+              метрополитена, после чего сможете кинуть кубик с этой клетки
+            </span>
+          </div>
+        )}
+
+        {cell.id === airport[0] && (
+          <div className="flex justify-between items-start gap-3 min-w-0">
+            <span className="font-mono text-md shrink-0">Аэропорт:</span>
+            <span className="font-mono text-md text-muted text-right wrap-break-word min-w-0 flex-1">
+              После захвата клетки, вы можете купить билет на самолет, который
+              отправит вас в конец карты, но вы ОБЯЗАНЫ будете пройти игру на
+              клетке. Никакие другие предметы не могут помочь вам.
+            </span>
+          </div>
+        )}
       </section>
       <div className="w-full border-b border-primary" />
       {data?.cell[0] && !["start", "jail", "parking"].includes(cell.type) && (
@@ -205,7 +278,7 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
                 className="font-mono text-xs"
                 style={{ color: getCellTax(data?.cell[0].level).color }}
               >
-                {`${getCellTax(data?.cell[0].level).money} чубриков`}
+                {data?.cellTax ?? 0} чубриков
               </span>
             </div>
           </section>
@@ -256,14 +329,25 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
         </Button>
       )}
 
+      {cell.id === airport[0] && (
+        <Button
+          className="w-full text-left font-mono transition-all duration-200 border border-yellow-500 text-yellow-500 hover:bg-yellow-950/10 font-bold"
+          onClick={handleAirport}
+        >
+          {loading ? (
+            <SmallLoader />
+          ) : (
+            `Купить билет (${data?.ticketPrice} чубриков)`
+          )}
+        </Button>
+      )}
+
       {data?.auntZina && data?.cellPoop && (
         <Button
           className="w-full text-left font-mono transition-all duration-200 border border-blue-700 text-blue-700 hover:bg-blue-950/10 font-bold"
-          onClick={() => {
-            handleRemovePoop();
-          }}
+          onClick={handleRemovePoop}
         >
-          Убрать кал
+          {loading ? <SmallLoader /> : "Убрать кал"}
         </Button>
       )}
     </main>

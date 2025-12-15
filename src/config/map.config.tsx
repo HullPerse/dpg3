@@ -27,3 +27,6 @@ export const mapButtons = [
     icon: <Trash />,
   },
 ];
+
+export const metro = [3, 23];
+export const airport = [14, 39];

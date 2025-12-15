@@ -1,5 +1,11 @@
 import { useDroppable } from "@dnd-kit/react";
-import { Minimize, Store } from "lucide-react";
+import {
+  Minimize,
+  PlaneLanding,
+  PlaneTakeoff,
+  Store,
+  TramFront,
+} from "lucide-react";
 import { memo, useCallback, useState } from "react";
 import PoopSvg from "@/components/shared/poop.component";
 import {
@@ -14,6 +20,7 @@ import type { MapCellProps } from "@/types/map";
 import type { User } from "@/types/users";
 import MapCard from "./card.component";
 import UserComponent from "./user.component";
+import { airport, metro } from "@/config/map.config";
 
 function Cell({ type, className, cell, info, user }: Readonly<MapCellProps>) {
   const auth = useLoginStore((state) => state.user);
@@ -118,6 +125,22 @@ function Cell({ type, className, cell, info, user }: Readonly<MapCellProps>) {
             {auth?.vendingMachine.includes(cell.id) && (
               <div className="rounded min-w-6 min-h-6 border border-border backdrop-blur-sm flex justify-center items-center text-xs font-bold">
                 <Store className="w-4 h-4 pointer-events-none" />
+              </div>
+            )}
+
+            {metro.includes(cell.id) && (
+              <div className="rounded min-w-6 min-h-6 border border-border backdrop-blur-sm flex justify-center items-center text-xs font-bold">
+                <TramFront className="w-4 h-4 pointer-events-none" />
+              </div>
+            )}
+
+            {airport.includes(cell.id) && (
+              <div className="rounded min-w-6 min-h-6 border border-border backdrop-blur-sm flex justify-center items-center text-xs font-bold">
+                {cell.id === airport[0] ? (
+                  <PlaneTakeoff className="w-4 h-4 pointer-events-none" />
+                ) : (
+                  <PlaneLanding className="w-4 h-4 pointer-events-none" />
+                )}
               </div>
             )}
           </section>
