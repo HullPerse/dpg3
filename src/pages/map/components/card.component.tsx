@@ -17,7 +17,7 @@ import {
   getType,
 } from "@/lib/utils";
 import { useLoginStore } from "@/store/login.store";
-import type { CellRecord, MapCellsType } from "@/types/map";
+import type { MapCellsType } from "@/types/map";
 
 const mapApi = new MapApi();
 const usersApi = new UsersApi();
@@ -156,8 +156,6 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
   if (isLoading) return <ModalLoading />;
   if (isError) return <ModalError />;
 
-  const cells = (data ?? []) as CellRecord[];
-
   return (
     <main className="flex flex-col gap-1  text-primary max-w-full">
       <section className="flex flex-row justify-center w-full">
@@ -198,16 +196,16 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
         ))}
       </section>
       <div className="w-full border-b border-primary" />
-      {cells[0] && !["start", "jail", "parking"].includes(cell.type) && (
+      {data?.cell[0] && !["start", "jail", "parking"].includes(cell.type) && (
         <>
           <section className="flex flex-col justify-between">
             <div className="flex justify-between gap-3">
               <span className="font-mono text-xs text-muted">Налог:</span>
               <span
                 className="font-mono text-xs"
-                style={{ color: getCellTax(cells[0].level).color }}
+                style={{ color: getCellTax(data?.cell[0].level).color }}
               >
-                {`${getCellTax(cells[0].level).money} чубриков`}
+                {`${getCellTax(data?.cell[0].level).money} чубриков`}
               </span>
             </div>
           </section>
@@ -219,7 +217,7 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
         <section className="flex flex-col gap-2">
           <div className="flex justify-between items-center text-[10px] font-mono uppercase tracking-wide text-muted">
             <span>История захвата:</span>
-            <span>{cells.length}×</span>
+            <span>{data?.cell.length}×</span>
           </div>
           <ul className="flex flex-col border border-primary/40 rounded-sm overflow-hidden">
             {userHistory.map(({ id, username, count }) => (

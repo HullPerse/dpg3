@@ -4,7 +4,6 @@ import { hexToRgb } from "@/lib/utils";
 import type { ThemeStore } from "@/types/store";
 import type { UserColors } from "@/types/users";
 import { useLoginStore } from "./login.store";
-import { client } from "@/api/client.api";
 
 const STORAGE_KEY = "colorStorage";
 
@@ -91,20 +90,6 @@ export const useThemeStore = create<ThemeStore>()(
         const updatedColors = { ...get().colors, ...color };
         set({ colors: updatedColors });
         setColorProperties(updatedColors);
-
-        // Update user profile if authenticated
-        const { isAuth, user } = useLoginStore.getState();
-        if (isAuth && user) {
-          const updateData: Record<string, string> = {};
-          if (color.primary) updateData.color = color.primary;
-          if (color.background) updateData.backgroundColor = color.background;
-          if (color.secondary) updateData.secondaryColor = color.secondary;
-          if (color.muted) updateData.mutedColor = color.muted;
-
-          if (Object.keys(updateData).length > 0) {
-            client.collection("users").update(user.id, updateData);
-          }
-        }
       },
 
       resetColors: () => {
