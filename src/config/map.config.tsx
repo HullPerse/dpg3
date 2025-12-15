@@ -30,3 +30,4 @@ export const mapButtons = [
 
 export const metro = [3, 23];
 export const airport = [14, 39];
+export const airportDiscount = "7oq8psyzmghi87u";

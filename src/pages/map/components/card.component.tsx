@@ -24,7 +24,7 @@ import {
 } from "@/lib/utils";
 import { useLoginStore } from "@/store/login.store";
 import type { MapCellsType } from "@/types/map";
-import { airport, metro } from "@/config/map.config";
+import { airport, airportDiscount, metro } from "@/config/map.config";
 
 const mapApi = new MapApi();
 const usersApi = new UsersApi();
@@ -66,13 +66,18 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
         return baseTax;
       };
 
+      const discount = await usersApi.itemAvailability(
+        String(user?.id),
+        airportDiscount,
+      );
+
       const allCells = await mapApi.getUserCells(String(user?.id));
       const price = Math.floor((allCells.length / 2) * 100);
 
       return {
         cell: cellData,
         cellTax: await calculateTax(),
-        ticketPrice: price,
+        ticketPrice: discount ? price / 2 : price,
         cellPoop: await mapApi.isPooped(cell.label),
         legendaryPoop: await usersApi.itemAvailability(
           String(user?.id),
@@ -186,10 +191,13 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
 
   const handleAirport = useCallback(async () => {
     if (!user || !data?.ticketPrice) return;
+    setLoading(true);
 
     await usersApi.changeMoney(user.id, -data?.ticketPrice);
 
     await usersApi.moveTarget(user.id, airport[1], 0);
+
+    setLoading(false);
   }, [user, data?.ticketPrice]);
 
   const invalidateQuery = useCallback(() => {
