@@ -1,10 +1,8 @@
 import path from "node:path";
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react-swc";
-import { defineConfig } from "vite";
-
 import vCache from "@raegen/vite-plugin-vitest-cache";
-import { chunkSplitPlugin } from "vite-plugin-chunk-split";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 import viteCompression from "vite-plugin-compression";
 import { VitePWA } from "vite-plugin-pwa";
 
@@ -12,7 +10,6 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    chunkSplitPlugin(),
     vCache(),
     viteCompression({
       algorithm: "brotliCompress",
