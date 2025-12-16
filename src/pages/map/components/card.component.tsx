@@ -201,7 +201,7 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
 
     const item = await itemsApi
       .getInventory(String(user.id))
-      .then((res) => res.find((item) => item.itemId === auntZina));
+      .then((res) => res.find((item) => item.itemId === airportDiscount));
 
     if (!item) return setLoading(false);
 
