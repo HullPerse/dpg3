@@ -147,6 +147,7 @@ export default function MainMap() {
           await usersApi.changeMoney(user.id, 500, 1);
           await usersApi.changeVending(user.id);
           await usersApi.changeTrash(user.id, false);
+          await usersApi.changeChurch(String(user?.id), false);
         }
       }
     },

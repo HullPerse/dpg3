@@ -105,6 +105,7 @@ export default function Header() {
       },
       data: gameData,
       status: "PLAYING",
+      taken: false,
     });
   };
 

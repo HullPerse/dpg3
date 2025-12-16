@@ -11,3 +11,6 @@ export const expressDelivery = "p48nvdlvzxgiyw2";
 export const noTax = "epmxvbhkkjdzlq1";
 export const electricityTax = "zfo2q9vxkinaiwz";
 export const lifeTax = "nrn3pzppoukbc1y";
+
+//map
+export const airportDiscount = "7oq8psyzmghi87u";

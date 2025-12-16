@@ -1,5 +1,6 @@
 import { useDroppable } from "@dnd-kit/react";
 import {
+  Church,
   Minimize,
   PlaneLanding,
   PlaneTakeoff,
@@ -20,7 +21,7 @@ import type { MapCellProps } from "@/types/map";
 import type { User } from "@/types/users";
 import MapCard from "./card.component";
 import UserComponent from "./user.component";
-import { airport, metro } from "@/config/map.config";
+import { airport, church, metro } from "@/config/map.config";
 
 function Cell({ type, className, cell, info, user }: Readonly<MapCellProps>) {
   const auth = useLoginStore((state) => state.user);
@@ -141,6 +142,12 @@ function Cell({ type, className, cell, info, user }: Readonly<MapCellProps>) {
                 ) : (
                   <PlaneLanding className="w-4 h-4 pointer-events-none" />
                 )}
+              </div>
+            )}
+
+            {cell.id === church && (
+              <div className="rounded min-w-6 min-h-6 border border-border backdrop-blur-sm flex justify-center items-center text-xs font-bold">
+                <Church className="w-4 h-4 pointer-events-none" />
               </div>
             )}
           </section>

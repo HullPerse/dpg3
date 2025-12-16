@@ -92,6 +92,7 @@ export default function Games() {
       },
       data: gameData,
       status: "PLAYING",
+      taken: false,
     });
   };
 

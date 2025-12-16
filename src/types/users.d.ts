@@ -17,6 +17,7 @@ export type User = {
   isPooped: boolean;
   jailStatus: boolean;
   trash: boolean;
+  church: boolean;
   vendingMachine: number[];
   createdAt: Date;
   updatedAt: Date;

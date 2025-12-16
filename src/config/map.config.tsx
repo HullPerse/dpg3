@@ -1,4 +1,11 @@
-import { Dices, Hamburger, PersonStanding, Toilet, Trash } from "lucide-react";
+import {
+  Church,
+  Dices,
+  Hamburger,
+  PersonStanding,
+  Toilet,
+  Trash,
+} from "lucide-react";
 
 export const mapButtons = [
   {
@@ -26,8 +33,13 @@ export const mapButtons = [
     label: "Мусорка",
     icon: <Trash />,
   },
+  {
+    type: "church",
+    label: "Церковь",
+    icon: <Church />,
+  },
 ];
 
-export const metro = [3, 23];
+export const metro = [8, 23];
 export const airport = [14, 39];
-export const airportDiscount = "7oq8psyzmghi87u";
+export const church = 17;

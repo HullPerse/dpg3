@@ -7,11 +7,12 @@ import { SmallLoader } from "@/components/ui/loader.components";
 import { Dialog } from "@/components/ui/modal.component";
 import { ModalError, ModalLoading } from "@/components/ui/modal.state";
 import { regularPoop } from "@/config/items.config";
-import { mapButtons } from "@/config/map.config";
+import { church, mapButtons } from "@/config/map.config";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLoginStore } from "@/store/login.store";
 import type { MapCellsType } from "@/types/map";
 
+import Church from "./church.component";
 import Dice from "./dice.component";
 import Trash from "./trash.component";
 import Vending from "./vending.component";
@@ -49,6 +50,7 @@ function Controls({ currentCell }: Readonly<{ currentCell: MapCellsType }>) {
       vending: !user.vendingMachine?.includes(user.data?.cell),
       poop: !data,
       trash: user.data.cell !== 20 || user.trash === true,
+      church: user.data.cell !== church || user.church,
     };
   }, [user, data]);
 
@@ -59,6 +61,9 @@ function Controls({ currentCell }: Readonly<{ currentCell: MapCellsType }>) {
         <Vending setIsOpen={() => setDialog({ open: false, type: null })} />
       ),
       trash: <Trash setIsOpen={() => setDialog({ open: false, type: null })} />,
+      church: (
+        <Church setIsOpen={() => setDialog({ open: false, type: null })} />
+      ),
     };
 
     return componentMap[type as keyof typeof componentMap];
@@ -112,6 +117,14 @@ function Controls({ currentCell }: Readonly<{ currentCell: MapCellsType }>) {
         });
         setLoading(false);
       },
+      church: () => {
+        setLoading(true);
+        setDialog({
+          open: true,
+          type: "church",
+        });
+        setLoading(false);
+      },
     };
   }, [user, currentCell]);
 
@@ -139,6 +152,7 @@ function Controls({ currentCell }: Readonly<{ currentCell: MapCellsType }>) {
 
   useSubscription("users", "*", invalidateQuery);
   useSubscription("cells", "*", invalidateQuery);
+  useSubscription("games", "*", invalidateQuery);
 
   if (isLoading) return <ModalLoading />;
   if (isError) return <ModalError />;

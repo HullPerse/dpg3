@@ -50,6 +50,7 @@ const GameCard = ({ game, setOpen }: ItemCardProps) => {
           price: game.price,
         },
         status: "PLAYING" as StatusType,
+        taken: false,
       };
 
       await new GamesApi().addGame(data as GameInterface);

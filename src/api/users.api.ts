@@ -48,6 +48,7 @@ export default class UsersApi {
         email: `${data.username.toUpperCase()}@notEmail.com`,
         admin: data.username.toUpperCase() === "HULLPERSE",
         vendingMachine: getVending(),
+        church: false,
         data: {
           money: {
             current: 0,
@@ -333,6 +334,12 @@ export default class UsersApi {
   changeTrash = async (id: string, trash: boolean) => {
     return await this.usersCollection.update(id, {
       trash: trash,
+    });
+  };
+
+  changeChurch = async (id: string, church: boolean) => {
+    return await this.usersCollection.update(id, {
+      church: church,
     });
   };
 

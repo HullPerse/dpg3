@@ -24,7 +24,8 @@ import {
 } from "@/lib/utils";
 import { useLoginStore } from "@/store/login.store";
 import type { MapCellsType } from "@/types/map";
-import { airport, airportDiscount, metro } from "@/config/map.config";
+import { airport, church, metro } from "@/config/map.config";
+import { airportDiscount } from "@/config/items.config";
 
 const mapApi = new MapApi();
 const usersApi = new UsersApi();
@@ -283,6 +284,17 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
               После захвата клетки, вы можете купить билет на самолет, который
               отправит вас в конец карты, но вы ОБЯЗАНЫ будете пройти игру на
               клетке. Никакие другие предметы не могут помочь вам.
+            </span>
+          </div>
+        )}
+
+        {cell.id === church && (
+          <div className="flex justify-between items-start gap-3 min-w-0">
+            <span className="font-mono text-md shrink-0">Церковь:</span>
+            <span className="font-mono text-md text-muted text-right wrap-break-word min-w-0 flex-1">
+              Все ваши грехи (игры) попадают в церковь. Вместо следующей игры,
+              вы можете забрать отсюда любую игру (другие участники не смогут
+              забрать эту игру) и пройти ее
             </span>
           </div>
         )}

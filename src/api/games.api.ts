@@ -1,5 +1,6 @@
 import type { GameInterface, GameType, UpdateGamePayload } from "@/types/games";
 import { client } from "./client.api";
+import LogsApi from "./logs.api";
 
 export default class GamesApi {
   private readonly gamesCollection = client.collection("games");
@@ -45,7 +46,18 @@ export default class GamesApi {
   };
 
   addGame = async (data: GameInterface) => {
-    return await this.gamesCollection.create(data);
+    await this.gamesCollection.create(data);
+
+    return await new LogsApi().createLog({
+      type: "newGame",
+      sender: {
+        id: data.user.id,
+        username: data.user.username,
+      },
+      receiver: undefined,
+      label: data.data.title,
+      image: data.data.image,
+    });
   };
 
   deleteGame = async (id: string) => {
@@ -121,6 +133,12 @@ export default class GamesApi {
   getGamesByUser = async (id: string) => {
     return await this.gamesCollection.getFullList({
       filter: `user.id = "${id}"`,
+    });
+  };
+
+  changeTaken = async (id: string, taken: boolean) => {
+    return await this.gamesCollection.update(id, {
+      taken: taken,
     });
   };
 

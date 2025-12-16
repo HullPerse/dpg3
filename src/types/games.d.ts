@@ -43,6 +43,7 @@ export interface GameInterface {
   reviewText?: string;
   reviewRating?: number;
   reviewImage?: File;
+  taken: boolean;
 }
 
 export type UpdateGamePayload = Partial<
