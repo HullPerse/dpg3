@@ -291,16 +291,18 @@ export default function Preset() {
       >
         <section className="flex flex-row max-lg:flex-col w-full justify-start items-center gap-2 ">
           <TabsList className="h-fit flex-wrap w-fit flex max-lg:flex-col gap-2 rounded-lg bg-background/50 backdrop-blur-sm p-1.5 border border-border/50 shadow-sm self-start max-lg:w-full">
-            {games?.map((game) => (
-              <TabsTrigger
-                key={game.label}
-                value={game.label}
-                className="rounded transition-all duration-200 hover:bg-primary/10 data-[state=active]:bg-primary/30 data-[state=active]:shadow-md cursor-pointer max-lg:w-full"
-                disabled={isRolling}
-              >
-                {game.label.toUpperCase()} ({game.count})
-              </TabsTrigger>
-            ))}
+            {games
+              ?.sort((a, b) => a.label.localeCompare(b.label))
+              .map((game) => (
+                <TabsTrigger
+                  key={game.label}
+                  value={game.label}
+                  className="rounded transition-all duration-200 hover:bg-primary/10 data-[state=active]:bg-primary/30 data-[state=active]:shadow-md cursor-pointer max-lg:w-full"
+                  disabled={isRolling}
+                >
+                  {game.label.toUpperCase()} ({game.count})
+                </TabsTrigger>
+              ))}
           </TabsList>
         </section>
         <section className="flex w-full justify-center">

@@ -202,18 +202,21 @@ export default function Games() {
   }, [isRolling, updateCenterHighlight]);
 
   const renderedItems = useMemo(
-    () =>
-      <>{renderWheelItems(
-        shuffledItems,
-        0,
-        isRolling,
-        containerRef as RefObject<HTMLDivElement>,
-        ITEM_WIDTH,
-        () => {},
-        undefined,
-        undefined,
-        new Map(),
-      )}</>,
+    () => (
+      <>
+        {renderWheelItems(
+          shuffledItems,
+          0,
+          isRolling,
+          containerRef as RefObject<HTMLDivElement>,
+          ITEM_WIDTH,
+          () => {},
+          undefined,
+          undefined,
+          new Map(),
+        )}
+      </>
+    ),
     [shuffledItems, isRolling],
   );
 
