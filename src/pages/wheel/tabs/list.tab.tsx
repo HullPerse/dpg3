@@ -8,6 +8,7 @@ import {
   Hash,
   Plus,
   Tag,
+  Workflow,
 } from "lucide-react";
 import type { RecordModel } from "pocketbase";
 import { useCallback, useRef, useState } from "react";
@@ -30,7 +31,7 @@ import AddItem from "@/pages/wheel/components/addItem.component";
 import { useLoginStore } from "@/store/login.store";
 import type { ItemType } from "@/types/items";
 
-type SortMethod = "name" | "date" | "type" | "charges";
+type SortMethod = "name" | "date" | "type" | "charges" | "auto";
 type SortDirection = "asc" | "desc";
 
 const sortMethodIcons = {
@@ -38,6 +39,7 @@ const sortMethodIcons = {
   date: Calendar,
   type: Tag,
   charges: Battery,
+  auto: Workflow,
 };
 
 const sortMethodLabels = {
@@ -45,6 +47,7 @@ const sortMethodLabels = {
   date: "По дате",
   type: "По типу",
   charges: "По зарядам",
+  auto: "По автоматическому изпользованию",
 };
 
 export default function List({
@@ -124,6 +127,12 @@ export default function List({
           comparison = chargeA - chargeB;
           break;
         }
+        case "auto": {
+          const autoA = a.auto || false;
+          const autoB = b.auto || false;
+          comparison = autoA - autoB;
+          break;
+        }
       }
 
       return sortDirection === "asc" ? comparison : -comparison;
@@ -147,7 +156,7 @@ export default function List({
   };
 
   const cycleSortMethod = () => {
-    const methods: SortMethod[] = ["name", "date", "type", "charges"];
+    const methods: SortMethod[] = ["name", "date", "type", "charges", "auto"];
     const currentIndex = methods.indexOf(sortMethod);
     const nextIndex = (currentIndex + 1) % methods.length;
     setSortMethod(methods[nextIndex]);
