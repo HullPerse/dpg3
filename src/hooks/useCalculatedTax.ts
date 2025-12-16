@@ -19,7 +19,7 @@ export function useCalculatedTax(userId?: string, cellLevel?: number) {
       }
 
       setIsLoading(true);
-      
+
       try {
         const baseTax = getCellTax(cellLevel).money;
         const [isNoTax, isElectricityTax, isLifeTax] = await Promise.all([
@@ -29,29 +29,48 @@ export function useCalculatedTax(userId?: string, cellLevel?: number) {
         ]);
 
         let finalTax = baseTax;
-        
+
         if (isNoTax) {
           const inventory = await itemsApi.getInventory(userId);
           const noTaxItem = inventory.find((item) => item.itemId === noTax);
-          
+
           if (noTaxItem) {
-            await usersApi.removeItem(noTaxItem.id);
+            await usersApi.removeItem(
+              noTaxItem.id,
+              userId,
+              noTaxItem.image,
+              noTaxItem.label,
+            );
             finalTax = 0;
           }
         } else if (isElectricityTax) {
           const electricityInventory = await itemsApi.getInventory(userId);
-          const electricityItem = electricityInventory.find((item) => item.itemId === electricityTax);
-          
+          const electricityItem = electricityInventory.find(
+            (item) => item.itemId === electricityTax,
+          );
+
           if (electricityItem) {
-            await usersApi.removeItem(electricityItem.id);
+            await usersApi.removeItem(
+              electricityItem.id,
+              userId,
+              electricityItem.image,
+              electricityItem.label,
+            );
             finalTax = baseTax * 4;
           }
         } else if (isLifeTax) {
           const lifeInventory = await itemsApi.getInventory(userId);
-          const lifeItem = lifeInventory.find((item) => item.itemId === lifeTax);
-          
+          const lifeItem = lifeInventory.find(
+            (item) => item.itemId === lifeTax,
+          );
+
           if (lifeItem) {
-            await usersApi.removeItem(lifeItem.id);
+            await usersApi.removeItem(
+              lifeItem.id,
+              userId,
+              lifeItem.image,
+              lifeItem.label,
+            );
             finalTax = baseTax * 10;
           }
         }

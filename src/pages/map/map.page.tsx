@@ -37,21 +37,21 @@ async function calculateTaxCost(
   if (isNoTax) {
     const item = await getItem(noTax);
     if (!item) return 0;
-    await usersApi.removeItem(item.id);
+    await usersApi.removeItem(item.id, userId, item.image, item.label);
     return 0;
   }
 
   if (isElectricityTax) {
     const item = await getItem(electricityTax);
     if (!item) return 0;
-    await usersApi.removeItem(item.id);
+    await usersApi.removeItem(item.id, userId, item.image, item.label);
     return ownedCell ? getCellTax(ownedCell.level).money * 4 : 0;
   }
 
   if (isLifeTax) {
     const item = await getItem(lifeTax);
     if (!item) return 0;
-    await usersApi.removeItem(item.id);
+    await usersApi.removeItem(item.id, userId, item.image, item.label);
     return ownedCell ? getCellTax(ownedCell.level).money * 10 : 0;
   }
 

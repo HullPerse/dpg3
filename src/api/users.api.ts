@@ -157,8 +157,36 @@ export default class UsersApi {
     });
   };
 
-  removeItem = async (id: string) => {
-    return await this.inventoryCollection.delete(id);
+  removeItem = async (
+    id: string,
+    userId?: string,
+    image?: string,
+    label?: string,
+  ) => {
+    await this.inventoryCollection.delete(id);
+
+    if (!userId) return;
+
+    const user = await this.usersCollection.getOne(userId, {
+      fields: "username",
+    });
+
+    const logData = {
+      username: user.username.toUpperCase(),
+      type: "newItem" as LogType["type"],
+      image: `${itemImage}${id}/${image}`,
+    };
+
+    return await this.logsApi.createLog({
+      type: logData.type,
+      sender: {
+        id: userId,
+        username: user.username.toUpperCase(),
+      },
+      receiver: undefined,
+      label: label,
+      image: logData.image,
+    });
   };
 
   changeCharges = async (inventoryId: string, charge: number) => {
@@ -215,7 +243,12 @@ export default class UsersApi {
         await this.mapApi.poopCell(userId, level, cell.label);
       }
 
-      await this.removeItem(userSkis.id);
+      await this.removeItem(
+        userSkis.id,
+        userId,
+        userSkis.image,
+        userSkis.label,
+      );
     }
 
     if (steppedOnPoop && cellName) {
@@ -224,7 +257,13 @@ export default class UsersApi {
       }
 
       await this.mapApi.removePoop(cellName);
-      if (userBoots) await this.removeItem(userBoots.id);
+      if (userBoots)
+        await this.removeItem(
+          userBoots.id,
+          userId,
+          userBoots.image,
+          userBoots.label,
+        );
     }
 
     const currentData = {

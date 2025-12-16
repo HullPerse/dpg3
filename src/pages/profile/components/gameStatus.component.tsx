@@ -171,7 +171,13 @@ function GameStatus({
           .getInventory(String(user?.id))
           .then((res) => res.find((item) => item.itemId === poopReview));
 
-        if (poopReviewId) await usersApi.removeItem(poopReviewId.id);
+        if (poopReviewId)
+          await usersApi.removeItem(
+            poopReviewId.id,
+            user?.id,
+            poopReviewId.image,
+            poopReviewId.label,
+          );
       }
 
       await gamesApi.updateGame(game.id, {

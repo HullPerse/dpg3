@@ -45,7 +45,12 @@ const ItemCard = ({
       if (newCharge < 1) {
         setIsUpdating(true);
         try {
-          await usersApi.removeItem(inventoryId);
+          await usersApi.removeItem(
+            inventoryId,
+            currentUser?.id,
+            item.image,
+            item.label,
+          );
           queryClient.invalidateQueries({
             queryKey: ["userInventoryData"],
           });
@@ -84,6 +89,8 @@ const ItemCard = ({
       isUpdating,
       isOwner,
       queryClient,
+      currentUser,
+      item,
     ],
   );
 

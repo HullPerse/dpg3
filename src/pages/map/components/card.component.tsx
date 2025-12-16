@@ -157,7 +157,12 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
       .then((res) => res.find((item) => item.itemId === auntZina));
     if (!auntZinaId) return;
 
-    await usersApi.removeItem(auntZinaId.id);
+    await usersApi.removeItem(
+      auntZinaId.id,
+      user.id,
+      auntZinaId.image,
+      auntZinaId.label,
+    );
   }, [user, cell.label]);
 
   const userHistory = useMemo(() => {
@@ -200,7 +205,7 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
     if (!item) return setLoading(false);
 
     await usersApi.changeMoney(user.id, -data?.ticketPrice);
-    await usersApi.removeItem(item.id);
+    await usersApi.removeItem(item.id, user.id, item.image, item.label);
     await usersApi.moveTarget(user.id, airport[1], 0);
 
     setLoading(false);

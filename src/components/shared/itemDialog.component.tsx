@@ -121,7 +121,12 @@ export default function ItemDialog({
 
     try {
       await itemsApi.addTrash(String(item.id));
-      await usersApi.removeItem(inventoryId as string);
+      await usersApi.removeItem(
+        inventoryId as string,
+        user.id,
+        item.image,
+        item.label,
+      );
       if (user?.id) {
         queryClient.invalidateQueries({
           queryKey: ["userInventoryData", user.id],
