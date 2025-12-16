@@ -125,6 +125,11 @@ export function typeColor(type: string) {
         "px-2 py-0.5 rounded text-xs font-medium border backdrop-blur-[2px]",
       toneClass: "bg-red-500/10 text-red-400 border-red-500/25",
     },
+    авто: {
+      baseClass:
+        "px-2 py-0.5 rounded text-xs font-medium border backdrop-blur-[2px]",
+      toneClass: "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",
+    },
   };
 
   return (

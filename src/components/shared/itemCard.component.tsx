@@ -207,6 +207,7 @@ const ItemCard = ({
                 {item.type}
               </span>
             )}
+
             {item.usage && (
               <span
                 className={cn(
@@ -215,6 +216,16 @@ const ItemCard = ({
                 )}
               >
                 Сразу
+              </span>
+            )}
+            {item.auto && (
+              <span
+                className={cn(
+                  "shrink-0 text-xs whitespace-nowrap",
+                  typeColor("авто").baseClass,
+                )}
+              >
+                Авто
               </span>
             )}
           </section>

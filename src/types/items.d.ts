@@ -7,7 +7,7 @@ export interface ItemType {
   charge?: number | null;
   image?: File;
   usage?: boolean;
-  automatic?: boolean;
+  auto?: boolean;
   effect: string;
   instanceId?: string;
 }

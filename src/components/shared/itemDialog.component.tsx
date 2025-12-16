@@ -311,6 +311,7 @@ export default function ItemDialog({
                 {item.type}
               </span>
             )}
+
             {item.usage && (
               <span
                 className={cn(
@@ -319,6 +320,14 @@ export default function ItemDialog({
                 )}
               >
                 Сразу
+              </span>
+            )}
+
+            {item.auto && (
+              <span
+                className={cn("shrink-0 text-xs", typeColor("авто").baseClass)}
+              >
+                Авто
               </span>
             )}
 

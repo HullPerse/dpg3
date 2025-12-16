@@ -32,6 +32,7 @@ export default function AddItem({
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [usage, setUsage] = useState(false);
+  const [auto, setAuto] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,6 +68,7 @@ export default function AddItem({
         charge: charges || null,
         image: image,
         usage: usage,
+        auto: auto,
         effect: "",
       };
 
@@ -193,6 +195,16 @@ export default function AddItem({
           </span>
         </div>
         <Switch checked={usage} onCheckedChange={setUsage} />
+      </section>
+
+      {/* Auto */}
+      <section className="flex items-center justify-between gap-4 p-3 border border-primary/50 rounded-lg bg-background/30">
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-medium text-foreground">
+            Используется автоматически
+          </span>
+        </div>
+        <Switch checked={auto} onCheckedChange={setAuto} />
       </section>
 
       {/* Charges */}

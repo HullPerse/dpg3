@@ -193,8 +193,14 @@ function MapCard({ cell }: Readonly<{ cell: MapCellsType }>) {
     if (!user || !data?.ticketPrice) return;
     setLoading(true);
 
-    await usersApi.changeMoney(user.id, -data?.ticketPrice);
+    const item = await itemsApi
+      .getInventory(String(user.id))
+      .then((res) => res.find((item) => item.itemId === auntZina));
 
+    if (!item) return setLoading(false);
+
+    await usersApi.changeMoney(user.id, -data?.ticketPrice);
+    await usersApi.removeItem(item.id);
     await usersApi.moveTarget(user.id, airport[1], 0);
 
     setLoading(false);
