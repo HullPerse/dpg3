@@ -25,54 +25,6 @@
   initial-value: #969696;
 }
 
-@property --dynamic-primary-opacity-15 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(0, 255, 0, 0.15);
-}
-
-@property --dynamic-primary-opacity-50 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(0, 255, 0, 0.5);
-}
-
-@property --dynamic-secondary-opacity-15 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(255, 255, 255, 0.15);
-}
-
-@property --dynamic-secondary-opacity-50 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(255, 255, 255, 0.5);
-}
-
-@property --dynamic-background-opacity-15 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(0, 0, 0, 0.15);
-}
-
-@property --dynamic-background-opacity-50 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(0, 0, 0, 0.5);
-}
-
-@property --dynamic-muted-opacity-15 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(150, 150, 150, 0.15);
-}
-
-@property --dynamic-muted-opacity-50 {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(150, 150, 150, 0.5);
-}
-
 :root {
   --dynamic-background: #000000;
   --dynamic-primary: #00ff00;
@@ -84,15 +36,7 @@
     --dynamic-background 300ms ease-in-out,
     --dynamic-primary 300ms ease-in-out,
     --dynamic-secondary 300ms ease-in-out,
-    --dynamic-muted 300ms ease-in-out,
-    --dynamic-primary-opacity-15 300ms ease-in-out,
-    --dynamic-primary-opacity-50 300ms ease-in-out,
-    --dynamic-secondary-opacity-15 300ms ease-in-out,
-    --dynamic-secondary-opacity-50 300ms ease-in-out,
-    --dynamic-background-opacity-15 300ms ease-in-out,
-    --dynamic-background-opacity-50 300ms ease-in-out,
-    --dynamic-muted-opacity-15 300ms ease-in-out,
-    --dynamic-muted-opacity-50 300ms ease-in-out;
+    --dynamic-muted 300ms ease-in-out;
 }
 
 @theme {
@@ -100,14 +44,6 @@
   --color-primary: var(--dynamic-primary);
   --color-secondary: var(--dynamic-secondary);
   --color-muted: var(--dynamic-muted);
-  --color-primary-opacity-15: var(--dynamic-primary-opacity-15);
-  --color-primary-opacity-50: var(--dynamic-primary-opacity-50);
-  --color-secondary-opacity-15: var(--dynamic-secondary-opacity-15);
-  --color-secondary-opacity-50: var(--dynamic-secondary-opacity-50);
-  --color-background-opacity-15: var(--dynamic-background-opacity-15);
-  --color-background-opacity-50: var(--dynamic-background-opacity-50);
-  --color-muted-opacity-15: var(--dynamic-muted-opacity-15);
-  --color-muted-opacity-50: var(--dynamic-muted-opacity-50);
 }
 
 @layer base {
