@@ -23,11 +23,12 @@ async function calculateTaxCost(
   userId: string,
   ownedCell?: cellsType,
 ): Promise<number> {
-  const [isNoTax, isElectricityTax, isLifeTax] = await Promise.all([
-    usersApi.itemAvailability(userId, noTax),
-    usersApi.itemAvailability(userId, electricityTax),
-    usersApi.itemAvailability(userId, lifeTax),
-  ]);
+  const isNoTax = await usersApi.itemAvailability(userId, noTax);
+  const isElectricityTax = await usersApi.itemAvailability(
+    userId,
+    electricityTax,
+  );
+  const isLifeTax = await usersApi.itemAvailability(userId, lifeTax);
 
   const getItem = async (itemId: string) => {
     const inventory = await itemsApi.getInventory(userId);
@@ -158,7 +159,10 @@ export default function MainMap() {
     async (event: DragEndEvent) => {
       if (!user) return;
 
-      const targetCell = findCell(event.operation.target?.id as string);
+      const targetId = event.operation.target?.id as string;
+
+      const targetCell = findCell(targetId);
+
       if (!targetCell) return;
 
       const cellInfo = await mapApi.getSingleCell(targetCell.label);
